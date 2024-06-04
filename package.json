@@ -1,0 +1,49 @@
+{
+  "name": "@jccdex/cloud",
+  "version": "1.0.0",
+  "description": "jccdex service sdk",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "npx eslint",
+    "test": "jest --coverage",
+    "pretty": "pretty-quick --staged"
+  },
+  "keywords": [
+    "jccdex",
+    "service"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JCCDex/jcc_cloud.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JCCDex/jcc_cloud/issues"
+  },
+  "homepage": "https://github.com/JCCDex/jcc_cloud#readme",
+  "author": "JCCDex",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.24.6",
+    "@babel/eslint-parser": "^7.24.6",
+    "@babel/preset-env": "^7.24.6",
+    "@babel/preset-typescript": "^7.24.6",
+    "@types/jest": "^29.5.12",
+    "@typescript-eslint/eslint-plugin": "^7.12.0",
+    "@typescript-eslint/parser": "^7.12.0",
+    "babel-jest": "^29.7.0",
+    "eslint": "^9.4.0",
+    "globals": "^15.3.0",
+    "husky": "^9.0.11",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.0",
+    "pretty-quick": "^4.0.0",
+    "sinon": "^18.0.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.12.0"
+  },
+  "packageManager": "yarn@3.6.3",
+  "dependencies": {
+    "axios": "^1.7.2"
+  }
+}
