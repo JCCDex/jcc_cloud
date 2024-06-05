@@ -1,3 +1,4 @@
+import { CloudError } from "./error";
 import fetch from "./fetch";
 import { IFetchBalancesOptions, IFetchBalancesResponse, IResponse } from "./types";
 
@@ -12,8 +13,8 @@ export default class JCCDexExplorer {
     this.baseUrl = baseUrl;
   }
 
-  private isSuccess(res): boolean {
-    return res?.code === "0";
+  private isSuccess(code): boolean {
+    return code === "0";
   }
 
   public async fetchBalances(options: IFetchBalancesOptions): Promise<IFetchBalancesResponse> {
@@ -26,10 +27,10 @@ export default class JCCDexExplorer {
         w: options.address
       }
     });
-    if (!this.isSuccess(res)) {
-      throw new Error(res.msg);
-    }
     const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
 
     delete data?._id;
     delete data?.feeflag;

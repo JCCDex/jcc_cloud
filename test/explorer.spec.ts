@@ -1,5 +1,6 @@
 import sinon from "sinon";
 import JCCDexExplorer from "../src/explorer";
+import { CloudError } from "../src/error";
 const fetch = require("../src/fetch");
 const sandbox = sinon.createSandbox();
 
@@ -18,12 +19,22 @@ describe("test explorer", () => {
         code: "-1",
         msg: "error"
       });
+      try {
+        await explorer.fetchBalances({
+          uuid: "jGa9J9TkqtBc",
+          address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi"
+        });
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
       await expect(
         explorer.fetchBalances({
           uuid: "jGa9J9TkqtBc",
           address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi"
         })
-      ).rejects.toThrow("error");
+      ).rejects.toThrow(new CloudError("-1", "error"));
     });
 
     test("should return balances", async () => {
@@ -50,6 +61,7 @@ describe("test explorer", () => {
         stub.calledOnceWithExactly({
           method: "get",
           baseURL: "https://swtcscan.jccdex.cn",
+          timeout: undefined,
           url: "/wallet/balance/jGa9J9TkqtBc",
           params: { w: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi" }
         })
