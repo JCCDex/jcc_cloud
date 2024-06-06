@@ -9,6 +9,10 @@ export default class JCCDexExplorer {
     this.baseUrl = baseUrl;
   }
 
+  public set timeout(v: number) {
+    fetch.defaults.timeout = v;
+  }
+
   public setBaseUrl(baseUrl: string) {
     this.baseUrl = baseUrl;
   }
@@ -21,7 +25,6 @@ export default class JCCDexExplorer {
     const res: IResponse = await fetch({
       method: "get",
       baseURL: this.baseUrl,
-      timeout: options.timeout,
       url: "/wallet/balance/" + options.uuid,
       params: {
         w: options.address

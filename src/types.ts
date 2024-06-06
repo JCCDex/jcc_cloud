@@ -1,6 +1,4 @@
-export interface IBaseRequest {
-  timeout?: number;
-}
+export interface IBaseRequest {}
 
 export interface IUUID extends IBaseRequest {
   uuid: string;

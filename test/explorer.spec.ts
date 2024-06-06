@@ -61,7 +61,6 @@ describe("test explorer", () => {
         stub.calledOnceWithExactly({
           method: "get",
           baseURL: "https://swtcscan.jccdex.cn",
-          timeout: undefined,
           url: "/wallet/balance/jGa9J9TkqtBc",
           params: { w: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi" }
         })
