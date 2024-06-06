@@ -1,10 +1,10 @@
 export interface IBaseRequest {}
 
-export interface IUUID extends IBaseRequest {
+export interface IUUID {
   uuid: string;
 }
 
-export interface IFetchBalancesOptions extends IUUID {
+export interface IFetchBalancesOptions extends IUUID, IBaseRequest {
   address: string;
 }
 
