@@ -15,9 +15,21 @@ export interface IResponse {
 }
 
 export interface IBalance {
+  /**
+   * Token name
+   */
   currency: string;
+  /**
+   * Token balance (include frozen)
+   */
   value: string;
+  /**
+   * Token frozen balance
+   */
   frozen: string;
+  /**
+   * Token issuer address
+   */
   issuer: string;
 }
 
