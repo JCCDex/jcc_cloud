@@ -1,15 +1,26 @@
 import { CloudError } from "./error";
 import fetch from "./fetch";
-import { IFetchBalancesOptions, IFetchBalancesResponse, IResponse } from "./types";
+import { IResponse, IOrderType,
+  IFetchBalancesOptions, IFetchBalancesResponse,
+  IFetchOffersOptions, IFetchOffersResponse,
+  IFetchHistoryOrdersOptions, IFetchHistoryOrdersResponse,
+  IFetchIssuedTokensOptions, IFetchIssuedTokensResponse,
+  IFetchHistoryFeesOptions, IFetchHistoryFeesResponse
+
+} from "./types";
 
 export default class JCCDexExplorer {
+  readonly timeOffset = 946684800;
+
+  public orderType = IOrderType;
+
   private baseUrl: string;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
   }
 
-  public set timeout(v: number) {
+  public setTimeout(v: number) {
     fetch.defaults.timeout = v;
   }
 
@@ -48,4 +59,109 @@ export default class JCCDexExplorer {
 
     return { code, msg, data: { balances } };
   }
+
+  public async fetchOffers(options: IFetchOffersOptions): Promise<IFetchOffersResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/wallet/offer/" + options.uuid,
+      params: {
+        w: options.address,
+        p: options.page || 0,
+        s: options.size || 20,
+        c: options.coinPair || "",
+        bs: options.buyOrSell || 0
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const offers = (data.list as any[] || []);
+    offers.forEach(offer => {
+      offer.time = offer.time + this.timeOffset;
+    });
+    return { code, msg, data: { offers } };
+  }
+
+  public async fetchHistoryOrders(options: IFetchHistoryOrdersOptions): Promise<IFetchHistoryOrdersResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/wallet/trans/" + options.uuid,
+      params: {
+        w: options.address,
+        p: options.page || 0,
+        s: options.size || 20,
+        b: options.beginTime || "",
+        e: options.endTime || "",
+        t: options.type || "",
+        c: options.coinPair || "",
+        bs: options.buyOrSell || 0
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const historOrders = (data.list as any[] || []);
+    historOrders.forEach(order => {
+      order.time = order.time + this.timeOffset;
+    });
+    return { code, msg, data: { historOrders } };
+  }
+
+  public async fetchIssuedTokens(options: IFetchIssuedTokensOptions): Promise<IFetchIssuedTokensResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/wallet/fingate_tokenlist/" + options.uuid,
+      params: {
+        w: options.address
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const tokens = (data[options.address] as any[] || []);
+    return { code, msg, data: { tokens } };
+  }
+
+  public async fetchHistoryFees(options: IFetchHistoryFeesOptions): Promise<IFetchHistoryFeesResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/wallet/trans/fee/" + options.uuid,
+      params: {
+        w: options.address,
+        p: options.page || 0,
+        s: options.size || 20,
+        b: options.beginTime || "",
+        e: options.endTime || "",
+        c: options.tokenAndIssuer || "",
+        t: "Fee",
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const fees = (data.list as any[] || []);
+
+    fees.forEach(fee => {
+      const [currency, issuer] = fee.currency.split("_");
+      fee.currency = currency;
+      fee.issuer = issuer || "";
+      fee.time = fee.time + this.timeOffset;
+    });
+    return { code, msg, data: { fees } };
+  }
+
 }
+
+
