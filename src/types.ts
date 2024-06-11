@@ -30,14 +30,14 @@ export interface IFetchBalancesResponse extends IResponse {
   };
 }
 
-export enum IPageSize {
+export enum PageSize {
   TEN = 10,
   TWENTY = 20,
   FIFTY = 50,
   HUNDRED = 100
 }
 
-export enum ITradeType {
+export enum TradeType {
   ALL = "",
   BUY = 1,
   SELL = 2
@@ -46,9 +46,9 @@ export enum ITradeType {
 export interface IFetchOffersOptions extends IUUID, IBaseRequest {
   address: string;
   page?: number;
-  size?: IPageSize;      // page size, default 20
+  size?: PageSize;    // page size, default 20
   coinPair?: string;  // "JETH-JBNB"
-  buyOrSell?: ITradeType; // trade type;  1: buy, 2: sell, default 0: all
+  buyOrSell?: TradeType; // trade type;  1: buy, 2: sell, default 0: all
 }
 
 export interface IOffer {
@@ -68,7 +68,7 @@ export interface IFetchOffersResponse extends IResponse {
   };
 }
 
-export enum IOrderType {
+export enum OrderType {
   ALL = "",
   OFFERCREATE = "OfferCreate", 
   OFFERAFFECT = "OfferAffect", 
@@ -80,11 +80,11 @@ export enum IOrderType {
 export interface IFetchHistoryOrdersOptions extends IUUID, IBaseRequest{
   address: string;
   page?: number;
-  size?: IPageSize;        // page size, default 20
+  size?: PageSize;      // page size, default 20
   beginTime?: string;   // the start time for query orders; format: "2021-1-1"
   endTime?: string;     // the end time for query order; format: "2021-3-31"
-  type?: IOrderType;    // order type {"OfferCreate", "OfferAffect", "OfferCancel", "Send", "Receive"}
-  buyOrSell?: ITradeType;   // trade type;  1: buy, 2: sell, default 0: all
+  type?: OrderType;     // order type {"OfferCreate", "OfferAffect", "OfferCancel", "Send", "Receive"}
+  buyOrSell?: TradeType;   // trade type;  1: buy, 2: sell, default 0: all
   /**
    * 1. coinPair can be empty, not as query condition
    * 2. if type = "OfferCreate" or "OfferAffect" or "OfferCancel", coinPair only be like "JETH-JUSDT" or "JETH-" or "-JUSDT"
@@ -150,7 +150,7 @@ export interface IFetchIssuedTokensResponse extends IResponse{
 export interface IFetchHistoryFeesOptions extends IUUID, IBaseRequest {
   address: string;
   page?: number;
-  size?: IPageSize;        // page size, default 20
+  size?: PageSize;        // page size, default 20
   beginTime?: string;      // the start time for query fees; format: "2021-1-1"
   endTime?: string;        // the end time for query fees; format: "2021-3-31"
   tokenAndIssuer?: string; // token and issuer; example: "JETH_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or"

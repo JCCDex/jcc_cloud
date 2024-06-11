@@ -1,6 +1,6 @@
 import { CloudError } from "./error";
 import fetch from "./fetch";
-import { IResponse, IOrderType, ITradeType, IPageSize,
+import { IResponse, OrderType, TradeType, PageSize,
   IFetchBalancesOptions, IFetchBalancesResponse,
   IFetchOffersOptions, IFetchOffersResponse,
   IFetchHistoryOrdersOptions, IFetchHistoryOrdersResponse,
@@ -12,11 +12,11 @@ import { IResponse, IOrderType, ITradeType, IPageSize,
 export default class JCCDexExplorer {
   readonly timeOffset = 946684800000;
 
-  public orderType = IOrderType;
+  public orderType = OrderType;
 
-  public tradeType = ITradeType;
+  public tradeType = TradeType;
 
-  public pageSize = IPageSize;
+  public pageSize = PageSize;
 
   private baseUrl: string;
 
