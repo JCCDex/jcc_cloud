@@ -1,12 +1,24 @@
 import { CloudError } from "./error";
 import fetch from "./fetch";
-import { IResponse, OrderType, TradeType, PageSize,
-  IFetchBalancesOptions, IFetchBalancesResponse,
-  IFetchOffersOptions, IFetchOffersResponse,
-  IFetchHistoryOrdersOptions, IFetchHistoryOrdersResponse,
-  IFetchIssuedTokensOptions, IFetchIssuedTokensResponse,
-  IFetchHistoryFeesOptions, IFetchHistoryFeesResponse
-
+import {
+  IResponse,
+  OrderType,
+  TradeType,
+  PageSize,
+  IFetchBalancesOptions,
+  IFetchBalancesResponse,
+  IFetchOffersOptions,
+  IFetchOffersResponse,
+  IFetchHistoryOrdersOptions,
+  IFetchHistoryOrdersResponse,
+  IFetchIssuedTokensOptions,
+  IFetchIssuedTokensResponse,
+  IFetchHistoryFeesOptions,
+  IFetchHistoryFeesResponse,
+  IIssueToken,
+  IHistoryOrder,
+  IOffer,
+  IHistoryFee
 } from "./types";
 
 export default class JCCDexExplorer {
@@ -82,8 +94,8 @@ export default class JCCDexExplorer {
       throw new CloudError(code, msg);
     }
 
-    const offers = (data.list as any[] || []);
-    offers.forEach(offer => {
+    const offers = (data.list as IOffer[]) || [];
+    offers.forEach((offer) => {
       offer.time = offer.time * 1000 + this.timeOffset;
     });
     return { code, msg, data: { offers } };
@@ -110,8 +122,8 @@ export default class JCCDexExplorer {
       throw new CloudError(code, msg);
     }
 
-    const historOrders = (data.list as any[] || []);
-    historOrders.forEach(order => {
+    const historOrders = (data.list as IHistoryOrder[]) || [];
+    historOrders.forEach((order) => {
       order.time = order.time * 1000 + this.timeOffset;
     });
     return { code, msg, data: { historOrders } };
@@ -131,7 +143,7 @@ export default class JCCDexExplorer {
       throw new CloudError(code, msg);
     }
 
-    const tokens = (data[options.address] as any[] || []);
+    const tokens = (data[options.address] as IIssueToken[]) || [];
     return { code, msg, data: { tokens } };
   }
 
@@ -147,7 +159,7 @@ export default class JCCDexExplorer {
         b: options.beginTime || "",
         e: options.endTime || "",
         c: options.tokenAndIssuer || "",
-        t: "Fee",
+        t: "Fee"
       }
     });
     const { code, msg, data } = res;
@@ -155,9 +167,9 @@ export default class JCCDexExplorer {
       throw new CloudError(code, msg);
     }
 
-    const fees = (data.list as any[] || []);
+    const fees = (data.list as IHistoryFee[]) || [];
 
-    fees.forEach(fee => {
+    fees.forEach((fee) => {
       const [currency, issuer] = fee.currency.split("_");
       fee.currency = currency;
       fee.issuer = issuer || "";
@@ -165,7 +177,4 @@ export default class JCCDexExplorer {
     });
     return { code, msg, data: { fees } };
   }
-
 }
-
-
