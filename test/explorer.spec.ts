@@ -148,8 +148,8 @@ describe("test explorer", () => {
       const res = await explorer.fetchOffers({
         uuid: "jGa9J9TkqtBc",
         address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
-        size: explorer.pageSize.Size10,
-        buyOrSell: explorer.tradeType.All
+        size: explorer.pageSize.TEN,
+        buyOrSell: explorer.tradeType.ALL
       });
 
       expect(
@@ -267,9 +267,9 @@ describe("test explorer", () => {
       const res = await explorer.fetchHistoryOrders({
         uuid: "jGa9J9TkqtBc",
         address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
-        size: explorer.pageSize.Size50,
-        type: explorer.orderType.OfferCreate,
-        buyOrSell: explorer.tradeType.Buy
+        size: explorer.pageSize.FIFTY,
+        type: explorer.orderType.OFFERCREATE,
+        buyOrSell: explorer.tradeType.BUY
       });
 
       expect(
@@ -296,7 +296,7 @@ describe("test explorer", () => {
         data: {
           historOrders: [
             {
-              type: explorer.orderType.OfferCreate,
+              type: explorer.orderType.OFFERCREATE,
               time: 100000 + timeOffset,
               hash: 'A5FAED341A6292447F130056A68ACB2155AE0C37287D04CF12DD17CCE1C0AA2B',
               block: 28818929,
@@ -480,7 +480,7 @@ describe("test explorer", () => {
       const res = await explorer.fetchHistoryFees({
         uuid: "jGa9J9TkqtBc",
         address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
-        size: explorer.pageSize.Size100,
+        size: explorer.pageSize.HUNDRED,
         tokenAndIssuer: "JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or"
       });
 

@@ -72,9 +72,9 @@ export default class JCCDexExplorer {
       params: {
         w: options.address,
         p: options.page || 0,
-        s: options.size || this.pageSize.Size20,
+        s: options.size || this.pageSize.TWENTY,
         c: options.coinPair || "",
-        bs: options.buyOrSell || this.tradeType.All
+        bs: options.buyOrSell || this.tradeType.ALL
       }
     });
     const { code, msg, data } = res;
@@ -97,12 +97,12 @@ export default class JCCDexExplorer {
       params: {
         w: options.address,
         p: options.page || 0,
-        s: options.size || this.pageSize.Size20,
+        s: options.size || this.pageSize.TWENTY,
         b: options.beginTime || "",
         e: options.endTime || "",
-        t: options.type || this.orderType.All,
+        t: options.type || this.orderType.ALL,
         c: options.coinPair || "",
-        bs: options.buyOrSell || this.tradeType.All
+        bs: options.buyOrSell || this.tradeType.ALL
       }
     });
     const { code, msg, data } = res;
@@ -143,7 +143,7 @@ export default class JCCDexExplorer {
       params: {
         w: options.address,
         p: options.page || 0,
-        s: options.size || this.pageSize.Size20,
+        s: options.size || this.pageSize.TWENTY,
         b: options.beginTime || "",
         e: options.endTime || "",
         c: options.tokenAndIssuer || "",

@@ -31,16 +31,16 @@ export interface IFetchBalancesResponse extends IResponse {
 }
 
 export enum IPageSize {
-  Size10 = 10,
-  Size20 = 20,
-  Size50 = 50,
-  Size100 = 100
+  TEN = 10,
+  TWENTY = 20,
+  FIFTY = 50,
+  HUNDRED = 100
 }
 
 export enum ITradeType {
-  All = "",
-  Buy = 1,
-  Sell = 2
+  ALL = "",
+  BUY = 1,
+  SELL = 2
 }
 
 export interface IFetchOffersOptions extends IUUID, IBaseRequest {
@@ -69,12 +69,12 @@ export interface IFetchOffersResponse extends IResponse {
 }
 
 export enum IOrderType {
-  All = "",
-  OfferCreate = "OfferCreate", 
-  OfferAffect = "OfferAffect", 
-  OfferCancel = "OfferCancel", 
-  Send = "Send", 
-  Receive = "Receive"
+  ALL = "",
+  OFFERCREATE = "OfferCreate", 
+  OFFERAFFECT = "OfferAffect", 
+  OFFERCANCEL = "OfferCancel", 
+  SEND = "Send", 
+  RECEIVE= "Receive"
 }
 
 export interface IFetchHistoryOrdersOptions extends IUUID, IBaseRequest{
