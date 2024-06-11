@@ -1,6 +1,6 @@
 import { CloudError } from "./error";
 import fetch from "./fetch";
-import { IResponse, IOrderType,
+import { IResponse, IOrderType, ITradeType, IPageSize,
   IFetchBalancesOptions, IFetchBalancesResponse,
   IFetchOffersOptions, IFetchOffersResponse,
   IFetchHistoryOrdersOptions, IFetchHistoryOrdersResponse,
@@ -10,9 +10,13 @@ import { IResponse, IOrderType,
 } from "./types";
 
 export default class JCCDexExplorer {
-  readonly timeOffset = 946684800;
+  readonly timeOffset = 946684800000;
 
   public orderType = IOrderType;
+
+  public tradeType = ITradeType;
+
+  public pageSize = IPageSize;
 
   private baseUrl: string;
 
@@ -20,7 +24,7 @@ export default class JCCDexExplorer {
     this.baseUrl = baseUrl;
   }
 
-  public setTimeout(v: number) {
+  public set timeout(v: number) {
     fetch.defaults.timeout = v;
   }
 
@@ -68,9 +72,9 @@ export default class JCCDexExplorer {
       params: {
         w: options.address,
         p: options.page || 0,
-        s: options.size || 20,
+        s: options.size || this.pageSize.Size20,
         c: options.coinPair || "",
-        bs: options.buyOrSell || 0
+        bs: options.buyOrSell || this.tradeType.All
       }
     });
     const { code, msg, data } = res;
@@ -80,7 +84,7 @@ export default class JCCDexExplorer {
 
     const offers = (data.list as any[] || []);
     offers.forEach(offer => {
-      offer.time = offer.time + this.timeOffset;
+      offer.time = offer.time * 1000 + this.timeOffset;
     });
     return { code, msg, data: { offers } };
   }
@@ -93,12 +97,12 @@ export default class JCCDexExplorer {
       params: {
         w: options.address,
         p: options.page || 0,
-        s: options.size || 20,
+        s: options.size || this.pageSize.Size20,
         b: options.beginTime || "",
         e: options.endTime || "",
-        t: options.type || "",
+        t: options.type || this.orderType.All,
         c: options.coinPair || "",
-        bs: options.buyOrSell || 0
+        bs: options.buyOrSell || this.tradeType.All
       }
     });
     const { code, msg, data } = res;
@@ -108,7 +112,7 @@ export default class JCCDexExplorer {
 
     const historOrders = (data.list as any[] || []);
     historOrders.forEach(order => {
-      order.time = order.time + this.timeOffset;
+      order.time = order.time * 1000 + this.timeOffset;
     });
     return { code, msg, data: { historOrders } };
   }
@@ -139,7 +143,7 @@ export default class JCCDexExplorer {
       params: {
         w: options.address,
         p: options.page || 0,
-        s: options.size || 20,
+        s: options.size || this.pageSize.Size20,
         b: options.beginTime || "",
         e: options.endTime || "",
         c: options.tokenAndIssuer || "",
@@ -157,7 +161,7 @@ export default class JCCDexExplorer {
       const [currency, issuer] = fee.currency.split("_");
       fee.currency = currency;
       fee.issuer = issuer || "";
-      fee.time = fee.time + this.timeOffset;
+      fee.time = fee.time * 1000 + this.timeOffset;
     });
     return { code, msg, data: { fees } };
   }

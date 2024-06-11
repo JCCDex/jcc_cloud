@@ -147,7 +147,9 @@ describe("test explorer", () => {
       });
       const res = await explorer.fetchOffers({
         uuid: "jGa9J9TkqtBc",
-        address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi"
+        address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+        size: explorer.pageSize.Size10,
+        buyOrSell: explorer.tradeType.All
       });
 
       expect(
@@ -158,9 +160,9 @@ describe("test explorer", () => {
           params: { 
             w: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
             p: 0,
-            s: 20,
+            s: 10,
             c: "",
-            bs: 0
+            bs: ""
           }
         })
       ).toEqual(true);
@@ -171,7 +173,7 @@ describe("test explorer", () => {
         data: {
           offers: [
             {
-              time: 100 + timeOffset,
+              time: 100000 + timeOffset,
               past: 1000,
               hash: "hash",
               block: 1000,
@@ -265,7 +267,9 @@ describe("test explorer", () => {
       const res = await explorer.fetchHistoryOrders({
         uuid: "jGa9J9TkqtBc",
         address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
-        type: explorer.orderType.OfferCreate
+        size: explorer.pageSize.Size50,
+        type: explorer.orderType.OfferCreate,
+        buyOrSell: explorer.tradeType.Buy
       });
 
       expect(
@@ -276,12 +280,12 @@ describe("test explorer", () => {
           params: { 
             w: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
             p: 0,
-            s: 20,
+            s: 50,
             b: "",
             e: "",
             t: "OfferCreate",
             c: "",
-            bs: 0
+            bs: 1
           }
         })
       ).toEqual(true);
@@ -293,7 +297,7 @@ describe("test explorer", () => {
           historOrders: [
             {
               type: explorer.orderType.OfferCreate,
-              time: 100 + timeOffset,
+              time: 100000 + timeOffset,
               hash: 'A5FAED341A6292447F130056A68ACB2155AE0C37287D04CF12DD17CCE1C0AA2B',
               block: 28818929,
               fee: 0.001,
@@ -475,7 +479,9 @@ describe("test explorer", () => {
       });
       const res = await explorer.fetchHistoryFees({
         uuid: "jGa9J9TkqtBc",
-        address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi"
+        address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+        size: explorer.pageSize.Size100,
+        tokenAndIssuer: "JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or"
       });
 
       expect(
@@ -486,10 +492,10 @@ describe("test explorer", () => {
           params: { 
             w: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi", 
             p: 0,
-            s: 20,
+            s: 100,
             b: "",
             e: "",
-            c: "",
+            c: "JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
             t: "Fee",
           }
         })
@@ -503,7 +509,7 @@ describe("test explorer", () => {
             {
               type: 'Fee',
               block: 28809485,
-              time: 100 + timeOffset,
+              time: 100000 + timeOffset,
               currency: 'JUSDT',
               value: '0.0019904444765127',
               den: 1000,
@@ -515,7 +521,7 @@ describe("test explorer", () => {
             {
               type: 'Fee',
               block: 28809485,
-              time: 200 + timeOffset,
+              time: 200000 + timeOffset,
               currency: 'JUSDT',
               value: '0.0092025487034873',
               den: 1000,

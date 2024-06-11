@@ -30,12 +30,25 @@ export interface IFetchBalancesResponse extends IResponse {
   };
 }
 
+export enum IPageSize {
+  Size10 = 10,
+  Size20 = 20,
+  Size50 = 50,
+  Size100 = 100
+}
+
+export enum ITradeType {
+  All = "",
+  Buy = 1,
+  Sell = 2
+}
+
 export interface IFetchOffersOptions extends IUUID, IBaseRequest {
   address: string;
   page?: number;
-  size?: number;      // page size, default 20
+  size?: IPageSize;      // page size, default 20
   coinPair?: string;  // "JETH-JBNB"
-  buyOrSell?: number; // trade type;  1: buy, 2: sell, default 0: all
+  buyOrSell?: ITradeType; // trade type;  1: buy, 2: sell, default 0: all
 }
 
 export interface IOffer {
@@ -56,6 +69,7 @@ export interface IFetchOffersResponse extends IResponse {
 }
 
 export enum IOrderType {
+  All = "",
   OfferCreate = "OfferCreate", 
   OfferAffect = "OfferAffect", 
   OfferCancel = "OfferCancel", 
@@ -66,11 +80,11 @@ export enum IOrderType {
 export interface IFetchHistoryOrdersOptions extends IUUID, IBaseRequest{
   address: string;
   page?: number;
-  size?: number;        // page size, default 20
+  size?: IPageSize;        // page size, default 20
   beginTime?: string;   // the start time for query orders; format: "2021-1-1"
   endTime?: string;     // the end time for query order; format: "2021-3-31"
   type?: IOrderType;    // order type {"OfferCreate", "OfferAffect", "OfferCancel", "Send", "Receive"}
-  buyOrSell?: number;   // trade type;  1: buy, 2: sell, default 0: all
+  buyOrSell?: ITradeType;   // trade type;  1: buy, 2: sell, default 0: all
   /**
    * 1. coinPair can be empty, not as query condition
    * 2. if type = "OfferCreate" or "OfferAffect" or "OfferCancel", coinPair only be like "JETH-JUSDT" or "JETH-" or "-JUSDT"
@@ -136,7 +150,7 @@ export interface IFetchIssuedTokensResponse extends IResponse{
 export interface IFetchHistoryFeesOptions extends IUUID, IBaseRequest {
   address: string;
   page?: number;
-  size?: number;           // page size, default 20
+  size?: IPageSize;        // page size, default 20
   beginTime?: string;      // the start time for query fees; format: "2021-1-1"
   endTime?: string;        // the end time for query fees; format: "2021-3-31"
   tokenAndIssuer?: string; // token and issuer; example: "JETH_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or"
