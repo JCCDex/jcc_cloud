@@ -5,7 +5,10 @@ import { IResponse, OrderType, TradeType, PageSize,
   IFetchOffersOptions, IFetchOffersResponse,
   IFetchHistoryOrdersOptions, IFetchHistoryOrdersResponse,
   IFetchIssuedTokensOptions, IFetchIssuedTokensResponse,
-  IFetchHistoryFeesOptions, IFetchHistoryFeesResponse
+  IFetchHistoryFeesOptions, IFetchHistoryFeesResponse,
+  IFetchBlockTransactionsOptions, IFetchBlockTransactionsResponse,
+  IFetchLatestSixBlocksOptions, IFetchLatestSixBlocksResponse,
+  IFetchAllBlocksOptions, IFetchAllBlocksResponse
 
 } from "./types";
 
@@ -32,7 +35,7 @@ export default class JCCDexExplorer {
     this.baseUrl = baseUrl;
   }
 
-  private isSuccess(code): boolean {
+  private isSuccess(code: string): boolean {
     return code === "0";
   }
 
@@ -85,6 +88,7 @@ export default class JCCDexExplorer {
     const offers = (data.list as any[] || []);
     offers.forEach(offer => {
       offer.time = offer.time * 1000 + this.timeOffset;
+      offer.past = offer.past * 1000;
     });
     return { code, msg, data: { offers } };
   }
@@ -113,6 +117,7 @@ export default class JCCDexExplorer {
     const historOrders = (data.list as any[] || []);
     historOrders.forEach(order => {
       order.time = order.time * 1000 + this.timeOffset;
+      order.past = order.past * 1000;
     });
     return { code, msg, data: { historOrders } };
   }
@@ -166,6 +171,80 @@ export default class JCCDexExplorer {
     return { code, msg, data: { fees } };
   }
 
+  public async fetchBlockTransactions(options: IFetchBlockTransactionsOptions): Promise<IFetchBlockTransactionsResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/block/trans/" + options.uuid,
+      params: {
+        b: options.blockNumber,
+        p: options.page || "",
+        s: options.size || this.pageSize.TWENTY
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const transactions = (data.list as any[] || []);
+
+    transactions.forEach(transaction => {
+      transaction.hash = transaction._id;
+      transaction.blockHash = transaction.upperHash;
+      delete transaction._id;
+      delete transaction.upperHash;
+      transaction.time = transaction.time * 1000 + this.timeOffset;
+    });
+    return { code, msg, data: { transactions } };
+  }
+
+  public async fetchLatestSixBlocks(options: IFetchLatestSixBlocksOptions): Promise<IFetchLatestSixBlocksResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/block/new/" + options.uuid,
+      params: {}
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    const blocks = (data.list as any[] || []);
+
+    blocks.forEach(block => {
+      block.block = block._id;
+      delete block._id;
+      block.time = block.time * 1000 + this.timeOffset;
+      block.past = block.past * 1000;
+    });
+    return { code, msg, data: { blocks } };
+  }
+
+  public async fetchAllBlocks(options: IFetchAllBlocksOptions): Promise<IFetchAllBlocksResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/block/all/" + options.uuid,
+      params: {
+        p: options.page || 0,
+        s: options.size || this.pageSize.TWENTY
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    const blocks = (data.list as any[] || []);
+
+    blocks.forEach(block => {
+      block.block = block._id;
+      delete block._id;
+      block.time = block.time * 1000 + this.timeOffset;
+      block.past = block.past * 1000;
+    });
+    return { code, msg, data: { blocks } };
+  }
 }
 
 

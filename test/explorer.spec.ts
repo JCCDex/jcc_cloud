@@ -174,7 +174,7 @@ describe("test explorer", () => {
           offers: [
             {
               time: 100000 + timeOffset,
-              past: 1000,
+              past: 1000000,
               hash: "hash",
               block: 1000,
               flag: 1,
@@ -323,7 +323,7 @@ describe("test explorer", () => {
                 issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
                 value: '2'
               },
-              past: 103,
+              past: 103000,
               flag: 1
             }
           ]
@@ -529,6 +529,487 @@ describe("test explorer", () => {
               platform: 'jDXCeSHSpZ9LiX6ihckWaYDeDt5hFrdTto',
               hash: '91DA75B6E07A2CF09C919A0B834000044A99F0840ACF1BFD0823FE59A8D186E3',
               issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or'
+            }
+          ]
+        }
+      });
+    });
+  });
+
+  describe("test fetchBlockTransactions", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      try {
+        await explorer.fetchBlockTransactions({
+          uuid: "jGa9J9TkqtBc",
+          blockNumber: 20545139,
+        });
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
+      await expect(
+        explorer.fetchBlockTransactions({
+          uuid: "jGa9J9TkqtBc",
+          blockNumber: 20545139,
+        })
+      ).rejects.toThrow(new CloudError("-1", "error"));
+    });
+
+    test("should return transactions", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        "data": {
+          "list": [
+            {
+              "_id": "3FBDAE6E57131B8E367270FA7524A11423C7B0E127DA789BE289CCDAD5A21CFD",
+              "upperHash": "3ED3930160AD1FE7727B36CC8182E3647D9DCA3855157913B40F31E3EFE75BE3",
+              "block": 28824756,
+              "time": 771413360,
+              "index": 0,
+              "type": "Payment",
+              "account": "jB6p3U47Faj8b21nzEoXsNjfBMsj9hGgth",
+              "seq": 2,
+              "fee": 0.01,
+              "succ": "tesSUCCESS",
+              "dest": "jHeqgUVFeDoiBcqeva2HCUSNk683UZfihP",
+              "amount": {
+                  "currency": "WUSDT",
+                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                  "value": "50.94586808"
+              }
+            },
+            {
+              "_id": "7401BAA50F0DA374DEC1F11FBFE06C30F03245BA04BB41687A813C49F51B92D0",
+              "upperHash": "3ED3930160AD1FE7727B36CC8182E3647D9DCA3855157913B40F31E3EFE75BE3",
+              "block": 28824756,
+              "time": 771413360,
+              "index": 2,
+              "type": "OfferCreate",
+              "account": "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+              "seq": 2150223,
+              "fee": 0.01,
+              "succ": "tesSUCCESS",
+              "takerGets": {
+                  "currency": "CSP",
+                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                  "value": "2280.01833525"
+              },
+              "takerPays": {
+                  "currency": "CCMOAC",
+                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                  "value": "14.24939964"
+              },
+              "platform": "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
+              "affectedNodes": [
+                {
+                  "account": "jBzGwUJtCm9cR8CKgfsSkMs647TB6eKC9D",
+                  "seq": 3634,
+                  "flags": 131072,
+                  "previous": {
+                      "takerGets": {
+                          "currency": "CCMOAC",
+                          "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                          "value": "29.45283332771408"
+                      },
+                      "takerPays": {
+                          "currency": "CSP",
+                          "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                          "value": "4676.821263733587"
+                      }
+                  },
+                  "final": {
+                      "takerGets": {
+                          "currency": "CCMOAC",
+                          "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                          "value": "15.09414903652932"
+                      },
+                      "takerPays": {
+                          "currency": "CSP",
+                          "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                          "value": "2396.802928483587"
+                      }
+                  },
+                  "brokerage": {
+                      "platform": "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
+                      "feeAccount": "jEZHFAYMZMrYVrqetoK9b8HBv2NE1YjaZN",
+                      "den": 1000,
+                      "num": 2,
+                      "currency": "CSP",
+                      "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                      "value": "4.5600366705"
+                  }
+                }
+              ],
+              "brokerage": {
+                  "platform": "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
+                  "feeAccount": "jEZHFAYMZMrYVrqetoK9b8HBv2NE1YjaZN",
+                  "den": 1000,
+                  "num": 2,
+                  "currency": "CCMOAC",
+                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                  "value": "0.02871736858236952"
+              }
+            },
+            {
+              "_id": "90973C48858F00661E6908CA95653C25CE17BEB0D0C4888071B14B107DB0DBEA",
+              "upperHash": "3ED3930160AD1FE7727B36CC8182E3647D9DCA3855157913B40F31E3EFE75BE3",
+              "block": 28824756,
+              "time": 771413360,
+              "index": 3,
+              "type": "OfferCancel",
+              "account": "jJG5GYgs6LE1phryL4vVMPyTrf7px6LQXW",
+              "seq": 46970,
+              "fee": 0.00001,
+              "succ": "tesSUCCESS",
+              "offerSeq": 42032,
+              "takerGets": {
+                  "currency": "JUSDT",
+                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                  "value": "1.7028459598464"
+              },
+              "takerPays": {
+                  "currency": "JBTC",
+                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                  "value": "0.000030003930519"
+              }
+            },
+          ]
+        }
+      });
+      const res = await explorer.fetchBlockTransactions({
+        uuid: "jGa9J9TkqtBc",
+        blockNumber: 28824756
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/block/trans/jGa9J9TkqtBc",
+          params: { 
+            b: 28824756,
+            p: "",
+            s: 20
+          }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          transactions: [
+            {
+              block: 28824756,
+              time: 1718098160000,
+              index: 0,
+              type: 'Payment',
+              account: 'jB6p3U47Faj8b21nzEoXsNjfBMsj9hGgth',
+              seq: 2,
+              fee: 0.01,
+              succ: 'tesSUCCESS',
+              dest: 'jHeqgUVFeDoiBcqeva2HCUSNk683UZfihP',
+              amount: {
+                currency: 'WUSDT',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                value: '50.94586808'
+              },
+              hash: '3FBDAE6E57131B8E367270FA7524A11423C7B0E127DA789BE289CCDAD5A21CFD',
+              blockHash: '3ED3930160AD1FE7727B36CC8182E3647D9DCA3855157913B40F31E3EFE75BE3'
+            },
+            {
+              block: 28824756,
+              time: 1718098160000,
+              index: 2,
+              type: 'OfferCreate',
+              account: 'j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi',
+              seq: 2150223,
+              fee: 0.01,
+              succ: 'tesSUCCESS',
+              takerGets: {
+                currency: 'CSP',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                value: '2280.01833525'
+              },
+              takerPays: {
+                currency: 'CCMOAC',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                value: '14.24939964'
+              },
+              platform: 'jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5',
+              affectedNodes: [
+                {
+                  account: 'jBzGwUJtCm9cR8CKgfsSkMs647TB6eKC9D',
+                  seq: 3634,
+                  flags: 131072,
+                  previous: {
+                    takerGets: {
+                      currency: 'CCMOAC',
+                      issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                      value: '29.45283332771408'
+                    },
+                    takerPays: {
+                      currency: 'CSP',
+                      issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                      value: '4676.821263733587'
+                    }
+                  },
+                  final: {
+                    takerGets: {
+                      currency: 'CCMOAC',
+                      issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                      value: '15.09414903652932'
+                    },
+                    takerPays: {
+                      currency: 'CSP',
+                      issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                      value: '2396.802928483587'
+                    }
+                  },
+                  brokerage: {
+                    platform: 'jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5',
+                    feeAccount: 'jEZHFAYMZMrYVrqetoK9b8HBv2NE1YjaZN',
+                    den: 1000,
+                    num: 2,
+                    currency: 'CSP',
+                    issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                    value: '4.5600366705'
+                  }
+                }
+              ],
+              brokerage: {
+                platform: 'jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5',
+                feeAccount: 'jEZHFAYMZMrYVrqetoK9b8HBv2NE1YjaZN',
+                den: 1000,
+                num: 2,
+                currency: 'CCMOAC',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                value: '0.02871736858236952'
+              },
+              hash: '7401BAA50F0DA374DEC1F11FBFE06C30F03245BA04BB41687A813C49F51B92D0',
+              blockHash: '3ED3930160AD1FE7727B36CC8182E3647D9DCA3855157913B40F31E3EFE75BE3'
+            },
+            {
+              block: 28824756,
+              time: 1718098160000,
+              index: 3,
+              type: 'OfferCancel',
+              account: 'jJG5GYgs6LE1phryL4vVMPyTrf7px6LQXW',
+              seq: 46970,
+              fee: 0.00001,
+              succ: 'tesSUCCESS',
+              offerSeq: 42032,
+              takerGets: {
+                currency: 'JUSDT',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                value: '1.7028459598464'
+              },
+              takerPays: {
+                currency: 'JBTC',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                value: '0.000030003930519'
+              },
+              hash: '90973C48858F00661E6908CA95653C25CE17BEB0D0C4888071B14B107DB0DBEA',
+              blockHash: '3ED3930160AD1FE7727B36CC8182E3647D9DCA3855157913B40F31E3EFE75BE3'
+            }
+          ]
+        }
+      });
+    });
+  });
+
+  describe("test fetchLatestSixBlocks", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      try {
+        await explorer.fetchLatestSixBlocks({uuid: "jGa9J9TkqtBc"});
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
+      await expect(
+        explorer.fetchLatestSixBlocks({uuid: "jGa9J9TkqtBc"})
+      ).rejects.toThrow(new CloudError("-1", "error"));
+    });
+
+    test("should return blocks", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        "data": {
+          "list": [
+            {
+              "_id": 28833309,
+              "hash": "787900085563AF65D568382A613C79A85D730456EF5F3CB52FF991062569AB93",
+              "parentHash": "5652451384C3BB7FC63EDA9796ED94DB77097CCAAC4B7138C404D88B5006C3DA",
+              "time": 771498890,
+              "transNum": 7,
+              "past": 18
+            },
+            {
+              "_id": 28833308,
+              "hash": "5652451384C3BB7FC63EDA9796ED94DB77097CCAAC4B7138C404D88B5006C3DA",
+              "parentHash": "839F460F63F2A764779C987763C9CDB4F331743F6C0B0B821A7A5BD1F29C03F8",
+              "time": 771498880,
+              "transNum": 13,
+              "past": 28
+            },
+            {
+              "_id": 28833307,
+              "hash": "839F460F63F2A764779C987763C9CDB4F331743F6C0B0B821A7A5BD1F29C03F8",
+              "parentHash": "95628DEF0BB90F62D49166B4F8B5B874AACF4AA1E65B914380E05E854C675723",
+              "time": 771498870,
+              "transNum": 0,
+              "past": 38
+            }
+          ]
+        }
+      });
+      const res = await explorer.fetchLatestSixBlocks({uuid: "jGa9J9TkqtBc"});
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/block/new/jGa9J9TkqtBc",
+          params: {}
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          blocks: [
+            {
+              hash: '787900085563AF65D568382A613C79A85D730456EF5F3CB52FF991062569AB93',
+              parentHash: '5652451384C3BB7FC63EDA9796ED94DB77097CCAAC4B7138C404D88B5006C3DA',
+              time: 1718183690000,
+              transNum: 7,
+              past: 18000,
+              block: 28833309
+            },
+            {
+              hash: '5652451384C3BB7FC63EDA9796ED94DB77097CCAAC4B7138C404D88B5006C3DA',
+              parentHash: '839F460F63F2A764779C987763C9CDB4F331743F6C0B0B821A7A5BD1F29C03F8',
+              time: 1718183680000,
+              transNum: 13,
+              past: 28000,
+              block: 28833308
+            },
+            {
+              hash: '839F460F63F2A764779C987763C9CDB4F331743F6C0B0B821A7A5BD1F29C03F8',
+              parentHash: '95628DEF0BB90F62D49166B4F8B5B874AACF4AA1E65B914380E05E854C675723',
+              time: 1718183670000,
+              transNum: 0,
+              past: 38000,
+              block: 28833307
+            }
+          ]
+        }
+      });
+    });
+  });
+
+  describe("test fetchAllBlocks", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      try {
+        await explorer.fetchAllBlocks({uuid: "jGa9J9TkqtBc"});
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
+      await expect(
+        explorer.fetchAllBlocks({uuid: "jGa9J9TkqtBc"})
+      ).rejects.toThrow(new CloudError("-1", "error"));
+    });
+
+    test("should return blocks", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        "data": {
+          "list": [
+            {
+              "_id": 28833422,
+              "hash": "F4B2723148C739F54C5D72E03E487C74F25207CBA5E62216291E674FAAAB65DF",
+              "parentHash": "6BF4913454833B441FEC9C6DA688A1294D4E195D294BFC3E16350D4F09153C69",
+              "time": 771500020,
+              "transNum": 2,
+              "past": 14
+            },
+            {
+              "_id": 28833421,
+              "hash": "6BF4913454833B441FEC9C6DA688A1294D4E195D294BFC3E16350D4F09153C69",
+              "parentHash": "35FEA85D76089D757B86B2ABD7BDD71161206702C743621F738A6DC2A3682596",
+              "time": 771500010,
+              "transNum": 0,
+              "past": 24
+            }
+          ]
+        }
+      });
+      const res = await explorer.fetchAllBlocks({uuid: "jGa9J9TkqtBc"});
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/block/all/jGa9J9TkqtBc",
+          params: {
+            p: 0,
+            s: 20
+          }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          blocks: [
+            {
+              hash: 'F4B2723148C739F54C5D72E03E487C74F25207CBA5E62216291E674FAAAB65DF',
+              parentHash: '6BF4913454833B441FEC9C6DA688A1294D4E195D294BFC3E16350D4F09153C69',
+              time: 1718184820000,
+              transNum: 2,
+              past: 14000,
+              block: 28833422
+            },
+            {
+              hash: '6BF4913454833B441FEC9C6DA688A1294D4E195D294BFC3E16350D4F09153C69',
+              parentHash: '35FEA85D76089D757B86B2ABD7BDD71161206702C743621F738A6DC2A3682596',
+              time: 1718184810000,
+              transNum: 0,
+              past: 24000,
+              block: 28833421
             }
           ]
         }
