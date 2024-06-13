@@ -27,6 +27,19 @@ import {
   IFetchAllBlocksOptions, 
   IFetchAllBlocksResponse,
   IBlockInfo,
+  IFetchLatestSixHashOptions,
+  IFetchLatestSixHashResponse,
+  IHashInfo,
+  IFetchAllHashOptions,
+  IFetchAllHashResponse,
+  TransactionType,
+  IFetchHashDetailOptions,
+  IFetchBlockHashDetailResponse,
+  IFetchTransHashDetailResponse,
+  IHashDetailInfo,
+  IBlockHashDetailInfo,
+  IFetchBlockHashTransactionsOptions,
+  IFetchBlockHashTransactionsResponse
 } from "./types";
 
 export default class JCCDexExplorer {
@@ -35,6 +48,8 @@ export default class JCCDexExplorer {
   public orderType = OrderType;
 
   public tradeType = TradeType;
+
+  public transactionType = TransactionType;
 
   public pageSize = PageSize;
 
@@ -213,7 +228,7 @@ export default class JCCDexExplorer {
       delete transaction.upperHash;
       transaction.time = transaction.time * 1000 + this.timeOffset;
     });
-    return { code, msg, data: { transactions } };
+    return { code, msg, data: { transactions, total: data.count as number } };
   }
 
   public async fetchLatestSixBlocks(options: IFetchLatestSixBlocksOptions): Promise<IFetchLatestSixBlocksResponse> {
@@ -262,6 +277,159 @@ export default class JCCDexExplorer {
     });
     return { code, msg, data: { blocks } };
   }
+
+  public async fetchLatestSixHash(options: IFetchLatestSixHashOptions): Promise<IFetchLatestSixHashResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/trans/new/" + options.uuid,
+      params: {}
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    const hashInfos = (data.list as IHashInfo[] || []);
+  
+    hashInfos.forEach(info => {
+      info.hash = info._id;
+      delete info._id;
+      info.time = info.time * 1000 + this.timeOffset;
+      info.past = info.past * 1000;
+    });
+    return { code, msg, data: { hashInfos } };
+  }
+
+  public async fetchAllHash(options: IFetchAllHashOptions): Promise<IFetchAllHashResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/trans/all/" + options.uuid,
+      params: {
+        p: options.page || 0,
+        s: options.size || this.pageSize.TWENTY,
+        b: options.beginTime || "",
+        e: options.endTime || "",
+        t: options.type || this.transactionType.ALL,
+        bs: options.buyOrSell || this.tradeType.ALL,
+        c: options.coinPair || "",
+        f: options.matchFlag || ""
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    const hashInfos = (data.list as IHashInfo[] || []);
+    const total = (data.count as number);
+  
+    hashInfos.forEach(info => {
+      info.hash = info._id;
+      info.success = info.succ;
+      delete info._id;
+      delete info.succ;
+      info.time = info.time * 1000 + this.timeOffset;
+      info.past = info.past * 1000;
+    });
+    return { code, msg, data: { hashInfos, total } };
+  }
+
+  public async fetchHashDetailInfo(options: IFetchHashDetailOptions): Promise<IFetchBlockHashDetailResponse | IFetchTransHashDetailResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/hash/detail/" + options.uuid,
+      params: {
+        h: options.hash
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    /** block hash resault */
+    if (data.info && data.list && Array.isArray(data.list)) {
+      const info = data.info as Record<string, unknown>;
+      return { code, msg, data: {
+          hashType: 1,
+          blockInfo: {
+            blockHash: info._id as string,
+            block: info.block as number,
+            time: info.time as number * 1000 + this.timeOffset,
+            past: info.past as number * 1000,
+            transNum: info.transNum as number,
+            parentHash: info.upperHash as string,
+            totalCoins: info.totalCoins as string
+          },
+          blockDetails: (data.list as IBlockHashDetailInfo[]).map((tInfo)=>{
+            tInfo.hash = tInfo._id;
+            tInfo.success = tInfo.succ;
+            return tInfo;
+          }),
+          total: data.count as number
+        }
+      };
+    }
+    /** transaction hash resault */
+    const hashDetails = {} as IHashDetailInfo;
+  
+    for (const key in data) {
+      const v = data[key];
+      switch (key) {
+        case "hashType":
+          continue;
+        case "_id":
+          hashDetails.hash = v as string;
+          break;
+        case "upperHash":
+          hashDetails.blockHash = v as string;
+          break;
+        case "succ":
+          hashDetails.success = v as string;
+          break;
+        case 'time':
+          hashDetails.time = v as number * 1000 + this.timeOffset;
+          break;
+        case 'past':
+          hashDetails.past = v as number * 1000;
+          break;
+        default:
+          hashDetails[key] = v;
+          break;
+      }
+    }
+    return { code, msg, data: {
+        hashType: 2,
+        hashDetails
+      } 
+    };
+  }
+
+  public async fetchBlockTransactionsByHash(options: IFetchBlockHashTransactionsOptions): Promise<IFetchBlockHashTransactionsResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/hash/trans/" + options.uuid,
+      params: {
+        h: options.blockHash,
+        p: options.page || 0,
+        s: options.size || this.pageSize.TWENTY,
+        n: 1 // this parameter seems to be bug, must be greater than 0
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const transactions = (data.list as IBlockHashDetailInfo[] || []);
+    transactions.forEach(trans => {
+      trans.hash = trans._id;
+      trans.success = trans.succ;
+      delete trans._id;
+      delete trans.succ;
+      delete trans.hashType;
+    });
+    return { code, msg, data: { transactions } };
+  }
 }
-
-
