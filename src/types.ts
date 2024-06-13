@@ -347,3 +347,8 @@ export interface IFetchNftTransfersResponse extends IResponse {
     count: number;
   };
 }
+
+export interface IFetchNftConfigsRequest extends IUUID, IBaseRequest {
+  fundCodeName?: string;
+  issuer?: string;
+}

@@ -32,7 +32,8 @@ import {
   IFetchNftsByIdOrNameOptions,
   IFetchNftsByIdOrNameResponse,
   IFetchNftTransfersOptions,
-  IFetchNftTransfersResponse
+  IFetchNftTransfersResponse,
+  IFetchNftConfigsRequest
 } from "./types";
 
 export default class JCCDexExplorer {
@@ -383,6 +384,44 @@ export default class JCCDexExplorer {
             tokenInfos: t.TokenInfos as unknown[],
             tokenOwner: t.TokenOwner as string,
             tokenSender: t.TokenSender as string
+          };
+        })
+      }
+    };
+  }
+
+  public async fetchNftConfigs(options: IFetchNftConfigsRequest): Promise<IFetchIssuerNftsResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/explorer/v1/nft/config/" + options.uuid,
+      params: {
+        n: options.fundCodeName,
+        w: options.issuer
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const nfts = (data.list as Record<string, unknown>[]) || [];
+    return {
+      code,
+      msg,
+      data: {
+        nfts: nfts.map((nft) => {
+          return {
+            fundCode: nft.FundCode as string,
+            issuer: nft.Issuer as string,
+            flags: nft.Flags as number,
+            fundCodeName: nft.FundCodeName as string,
+            ledgerIndex: nft.LedgerIndex as string,
+            tokenIssued: nft.TokenIssued as string,
+            tokenSize: nft.TokenSize as string,
+            hash: nft.hash as string,
+            issuerAccountId: nft.issuer_accountid as string,
+            issuerTime: (nft.issuer_time as number) * 1000 + this.timeOffset
           };
         })
       }
