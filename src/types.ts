@@ -302,7 +302,7 @@ export interface IFetchNftsByIdOrNameResponse extends IResponse {
   };
 }
 
-enum NftTransactionType {
+export enum NftTransactionType {
   TokenIssue = "TokenIssue",
   TransferToken = "TransferToken",
   TokenDel = "TokenDel"
@@ -351,4 +351,46 @@ export interface IFetchNftTransfersResponse extends IResponse {
 export interface IFetchNftConfigsRequest extends IUUID, IBaseRequest {
   fundCodeName?: string;
   issuer?: string;
+}
+
+export enum NFTStatus {
+  Valid = 1,
+  Invalid = 0
+}
+
+export interface IFetchNftTokenInfoRequest extends IUUID, IBaseRequest {
+  tokenId?: string;
+  address?: string;
+  issuer?: string;
+  fundCodeName?: string;
+  valid?: NFTStatus;
+  page?: number;
+  size?: PageSize;
+}
+
+export interface INftTokenInfo {
+  tokenId: string;
+  flags: number;
+  fundCode: string;
+  fundCodeName: string;
+  issuer: string;
+  ledgerIndex: string;
+  lowNode: string;
+  tokenInfos: unknown[];
+  tokenOwner: string;
+  tokenSender: string;
+  block: number;
+  hash: string;
+  index: number;
+  inservice: number;
+  issuerTime: number;
+  time: number;
+  type: string;
+}
+
+export interface IFetchNftTokenInfoResponse extends IResponse {
+  data: {
+    nfts: INftTokenInfo[];
+    count: number;
+  };
 }

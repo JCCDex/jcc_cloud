@@ -33,7 +33,9 @@ import {
   IFetchNftsByIdOrNameResponse,
   IFetchNftTransfersOptions,
   IFetchNftTransfersResponse,
-  IFetchNftConfigsRequest
+  IFetchNftConfigsRequest,
+  IFetchNftTokenInfoRequest,
+  IFetchNftTokenInfoResponse
 } from "./types";
 
 export default class JCCDexExplorer {
@@ -422,6 +424,55 @@ export default class JCCDexExplorer {
             hash: nft.hash as string,
             issuerAccountId: nft.issuer_accountid as string,
             issuerTime: (nft.issuer_time as number) * 1000 + this.timeOffset
+          };
+        })
+      }
+    };
+  }
+
+  public async fetchNftTokenInfo(options: IFetchNftTokenInfoRequest): Promise<IFetchNftTokenInfoResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/explorer/v1/nft/tokeninfo/" + options.uuid,
+      params: {
+        k: options.tokenId,
+        w: options.address,
+        p: options.page || 0,
+        s: options.size || this.pageSize.TWENTY,
+        i: options.issuer,
+        n: options.fundCodeName,
+        valid: options.valid
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    return {
+      code,
+      msg,
+      data: {
+        count: data.count as number,
+        nfts: (data.list as Record<string, unknown>[]).map((t) => {
+          return {
+            tokenId: t.TokenID as string,
+            type: t.type as string,
+            time: (t.time as number) * 1000 + this.timeOffset,
+            hash: t.hash as string,
+            block: t.block as number,
+            index: t.index as number,
+            flags: t.Flags as number,
+            fundCode: t.FundCode as string,
+            fundCodeName: t.FundCodeName as string,
+            issuer: t.Issuer as string,
+            lowNode: t.LowNode as string,
+            tokenInfos: t.TokenInfos as unknown[],
+            tokenOwner: t.TokenOwner as string,
+            tokenSender: t.TokenSender as string,
+            ledgerIndex: t.LedgerIndex as string,
+            inservice: t.inservice as number,
+            issuerTime: (t.issuer_time as number) * 1000 + this.timeOffset
           };
         })
       }
