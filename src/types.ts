@@ -60,8 +60,8 @@ export interface IOffer {
   takerGets: IToken; // currency and quantity to be paid for the offer order
   takerPays: IToken; // currency and quantity to be received for the offer order
   seq: number; // the sequence number of the offer order
-  getsV?: number;     // the value of takerGets
-  paysV?: number;     // the value of takerPays
+  getsV?: number; // the value of takerGets
+  paysV?: number; // the value of takerPays
   gets_pays?: number; // the value of takerGets / takerPays,
   pays_gets?: number; // the value of takerPays / takerGets,
 }
@@ -178,47 +178,49 @@ export interface IFetchHistoryFeesResponse extends IResponse {
 
 export interface IFetchBlockTransactionsOptions extends IUUID, IBaseRequest {
   blockNumber: number;
-  page?: number;        // page if null, return all transactions
-  size?: PageSize;      // page size, default 20
+  page?: number; // page if null, return all transactions
+  size?: PageSize; // page size, default 20
 }
 
 interface IMatchTradeInfo {
-  account: string;      // be match trade account
-  seq : number;         // match trade sequence
-  flags: number;        // match trade flags
-  previous: {           // before this match trade , the transaction info
-    takerGets: IToken;  // currency and quantity to be paid for the transaction 
-    takesPays: IToken;  // currency and quantity to be received for the transaction
-  },   
-  final: {              // after this match trade , the transaction info
-    takerGets: IToken;  // currency and quantity to be paid for the transaction
-    takesPays: IToken;  // currency and quantity to be received for the transaction
-  },
+  account: string; // be match trade account
+  seq: number; // match trade sequence
+  flags: number; // match trade flags
+  previous: {
+    // before this match trade , the transaction info
+    takerGets: IToken; // currency and quantity to be paid for the transaction
+    takesPays: IToken; // currency and quantity to be received for the transaction
+  };
+  final: {
+    // after this match trade , the transaction info
+    takerGets: IToken; // currency and quantity to be paid for the transaction
+    takesPays: IToken; // currency and quantity to be received for the transaction
+  };
   brokerage?: IBrokerage; // brokerage info of this match trade
 }
 
 export interface IBlockTransaction {
-  _id?: string;       // transaction hash
-  hash: string;       // transaction hash
+  _id?: string; // transaction hash
+  hash: string; // transaction hash
   upperHash?: string; // block hash
-  blockHash: string;  // block hash
-  block: number;      // block number
-  time: number;       // transaction time (ms)
-  index: number;      // transaction index in block
-  type: string;       // transaction type ("Payment", "OfferCreate", "OfferCancel")
-  account: string;    // transaction account
-  seq: number;        // transaction sequence
-  fee: number;        // transaction gas fee
-  success: string;    // transaction status ("tesSUCCESS" means success)
-  memos?: unknown[];      // tansfer memo, when type = "Payment"
-  dest?: string;      // destination account, when type = "Payment"
-  amount?: IToken;    // transfer amount, when type = "Payment"
-  platform?: string;  // platform account, when type = "OfferCreate" | "OfferCancel"
+  blockHash: string; // block hash
+  block: number; // block number
+  time: number; // transaction time (ms)
+  index: number; // transaction index in block
+  type: string; // transaction type ("Payment", "OfferCreate", "OfferCancel")
+  account: string; // transaction account
+  seq: number; // transaction sequence
+  fee: number; // transaction gas fee
+  succ: string; // transaction status ("tesSUCCESS" means success)
+  memos?: unknown[]; // tansfer memo, when type = "Payment"
+  dest?: string; // destination account, when type = "Payment"
+  amount?: IToken; // transfer amount, when type = "Payment"
+  platform?: string; // platform account, when type = "OfferCreate" | "OfferCancel"
   takerGets?: IToken; // currency and quantity to be paid for transaction; when type = "OfferCreate" | "OfferCancel"
   takerPays?: IToken; // currency and quantity to be received for transaction; when type = "OfferCreate" |"OfferCancel"
-  realGets?: IToken;  // actual remaining quantity to be paid of this transaction; when type = "OfferCreate"
-  realPays?: IToken;  // actual remaining quantity to be received of this transaction; when type = "OfferCreate"
-  brokerage?: IBrokerage;  // brokerage info of transaction; when type = "OfferCreate" | "OfferCancel"
+  realGets?: IToken; // actual remaining quantity to be paid of this transaction; when type = "OfferCreate"
+  realPays?: IToken; // actual remaining quantity to be received of this transaction; when type = "OfferCreate"
+  brokerage?: IBrokerage; // brokerage info of transaction; when type = "OfferCreate" | "OfferCancel"
   affectedNodes?: IMatchTradeInfo[]; // the matched trades info of this transaction; when type = "OfferCreate"
 }
 
@@ -231,13 +233,13 @@ export interface IFetchBlockTransactionsResponse extends IResponse {
 export interface IFetchLatestSixBlocksOptions extends IUUID, IBaseRequest {}
 
 export interface IBlockInfo {
-  _id?: number;       // block number
-  block: number;      // block number
-  time: number;       // block born time or called block close time; (ms)
-  transNum: number;   // the number of transactions in this block
-  hash: string;       // block hash
+  _id?: number; // block number
+  block: number; // block number
+  time: number; // block born time or called block close time; (ms)
+  transNum: number; // the number of transactions in this block
+  hash: string; // block hash
   parentHash: string; // parent block hash
-  past: number;       // the time from now to block born time (ms)
+  past: number; // the time from now to block born time (ms)
 }
 
 export interface IFetchLatestSixBlocksResponse extends IResponse {
@@ -247,12 +249,148 @@ export interface IFetchLatestSixBlocksResponse extends IResponse {
 }
 
 export interface IFetchAllBlocksOptions extends IUUID, IBaseRequest {
-  page?: number;       // page default 0
-  size?: PageSize;     // page size, default 20
+  page?: number; // page default 0
+  size?: PageSize; // page size, default 20
 }
 
 export interface IFetchAllBlocksResponse extends IResponse {
   data: {
     blocks: IBlockInfo[];
+  };
+}
+
+export interface IFetchIssuerNftsOptions extends IUUID, IBaseRequest {
+  issuer: string;
+  page?: number;
+  size?: PageSize; // page size, default 20
+}
+
+export interface IIssuerNft {
+  fundCode: string;
+  issuer: string;
+  /**
+   * 0: Valid
+   */
+  flags: number;
+  fundCodeName: string;
+  ledgerIndex: string;
+  tokenIssued: string;
+  tokenSize: string;
+  hash: string;
+  issuerAccountId: string;
+  issuerTime: number;
+}
+
+export interface IFetchIssuerNftsResponse extends IResponse {
+  data: {
+    nfts: IIssuerNft[];
+  };
+}
+
+export interface IFetchNftsByIdOrNameOptions extends IUUID, IBaseRequest {
+  tokenId?: string;
+  tokenName?: string;
+}
+
+export interface IFetchNftsByIdOrNameResponse extends IResponse {
+  data: {
+    tokenIds: string[];
+    tokenNames: {
+      name: string;
+      holder: string;
+    }[];
+  };
+}
+
+export enum NftTransactionType {
+  TokenIssue = "TokenIssue",
+  TransferToken = "TransferToken",
+  TokenDel = "TokenDel"
+}
+
+export interface IFetchNftTransfersOptions extends IUUID, IBaseRequest {
+  address?: string;
+  tokenId?: string;
+  type?: NftTransactionType;
+  page?: number;
+  size?: PageSize;
+  beginTime?: string;
+  endTime?: string;
+  counterparty?: string;
+}
+
+export interface INftTransfer {
+  wallet: string;
+  type: string;
+  time: number;
+  hash: string;
+  block: number;
+  fee: string;
+  success: string;
+  seq: number;
+  offer: number;
+  index: number;
+  tokenId: string;
+  flags: number;
+  fundCode: string;
+  fundCodeName: string;
+  issuer: string;
+  lowNode: string;
+  tokenInfos: unknown[];
+  tokenOwner: string;
+  tokenSender: string;
+}
+
+export interface IFetchNftTransfersResponse extends IResponse {
+  data: {
+    transfers: INftTransfer[];
+    count: number;
+  };
+}
+
+export interface IFetchNftConfigsRequest extends IUUID, IBaseRequest {
+  fundCodeName?: string;
+  issuer?: string;
+}
+
+export enum NFTStatus {
+  Valid = 1,
+  Invalid = 0
+}
+
+export interface IFetchNftTokenInfoRequest extends IUUID, IBaseRequest {
+  tokenId?: string;
+  address?: string;
+  issuer?: string;
+  fundCodeName?: string;
+  valid?: NFTStatus;
+  page?: number;
+  size?: PageSize;
+}
+
+export interface INftTokenInfo {
+  tokenId: string;
+  flags: number;
+  fundCode: string;
+  fundCodeName: string;
+  issuer: string;
+  ledgerIndex: string;
+  lowNode: string;
+  tokenInfos: unknown[];
+  tokenOwner: string;
+  tokenSender: string;
+  block: number;
+  hash: string;
+  index: number;
+  inservice: number;
+  issuerTime: number;
+  time: number;
+  type: string;
+}
+
+export interface IFetchNftTokenInfoResponse extends IResponse {
+  data: {
+    nfts: INftTokenInfo[];
+    count: number;
   };
 }

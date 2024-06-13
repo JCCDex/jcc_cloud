@@ -24,9 +24,18 @@ import {
   IBlockTransaction,
   IFetchLatestSixBlocksOptions,
   IFetchLatestSixBlocksResponse,
-  IFetchAllBlocksOptions, 
+  IFetchAllBlocksOptions,
   IFetchAllBlocksResponse,
   IBlockInfo,
+  IFetchIssuerNftsOptions,
+  IFetchIssuerNftsResponse,
+  IFetchNftsByIdOrNameOptions,
+  IFetchNftsByIdOrNameResponse,
+  IFetchNftTransfersOptions,
+  IFetchNftTransfersResponse,
+  IFetchNftConfigsRequest,
+  IFetchNftTokenInfoRequest,
+  IFetchNftTokenInfoResponse
 } from "./types";
 
 export default class JCCDexExplorer {
@@ -188,7 +197,9 @@ export default class JCCDexExplorer {
     return { code, msg, data: { fees } };
   }
 
-  public async fetchBlockTransactions(options: IFetchBlockTransactionsOptions): Promise<IFetchBlockTransactionsResponse> {
+  public async fetchBlockTransactions(
+    options: IFetchBlockTransactionsOptions
+  ): Promise<IFetchBlockTransactionsResponse> {
     const res: IResponse = await fetch({
       method: "get",
       baseURL: this.baseUrl,
@@ -204,9 +215,9 @@ export default class JCCDexExplorer {
       throw new CloudError(code, msg);
     }
 
-    const transactions = (data.list as IBlockTransaction[] || []);
+    const transactions = (data.list as IBlockTransaction[]) || [];
 
-    transactions.forEach(transaction => {
+    transactions.forEach((transaction) => {
       transaction.hash = transaction._id;
       transaction.blockHash = transaction.upperHash;
       delete transaction._id;
@@ -227,9 +238,9 @@ export default class JCCDexExplorer {
     if (!this.isSuccess(code)) {
       throw new CloudError(code, msg);
     }
-    const blocks = (data.list as IBlockInfo[] || []);
+    const blocks = (data.list as IBlockInfo[]) || [];
 
-    blocks.forEach(block => {
+    blocks.forEach((block) => {
       block.block = block._id;
       delete block._id;
       block.time = block.time * 1000 + this.timeOffset;
@@ -252,9 +263,9 @@ export default class JCCDexExplorer {
     if (!this.isSuccess(code)) {
       throw new CloudError(code, msg);
     }
-    const blocks = (data.list as IBlockInfo[] || []);
+    const blocks = (data.list as IBlockInfo[]) || [];
 
-    blocks.forEach(block => {
+    blocks.forEach((block) => {
       block.block = block._id;
       delete block._id;
       block.time = block.time * 1000 + this.timeOffset;
@@ -262,6 +273,209 @@ export default class JCCDexExplorer {
     });
     return { code, msg, data: { blocks } };
   }
+
+  public async fetchIssuedNfts(options: IFetchIssuerNftsOptions): Promise<IFetchIssuerNftsResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/explorer/v1/nft/config/all" + options.uuid,
+      params: {
+        i: options.issuer,
+        p: options.page || 0,
+        s: options.size || this.pageSize.TWENTY
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    const nfts = (data.list as Record<string, unknown>[]) || [];
+    return {
+      code,
+      msg,
+      data: {
+        nfts: nfts.map((nft) => {
+          return {
+            fundCode: nft.FundCode as string,
+            issuer: nft.Issuer as string,
+            flags: nft.Flags as number,
+            fundCodeName: nft.FundCodeName as string,
+            ledgerIndex: nft.LedgerIndex as string,
+            tokenIssued: nft.TokenIssued as string,
+            tokenSize: nft.TokenSize as string,
+            hash: nft.hash as string,
+            issuerAccountId: nft.issuer_accountid as string,
+            issuerTime: (nft.issuer_time as number) * 1000 + this.timeOffset
+          };
+        })
+      }
+    };
+  }
+
+  public async fetchNftsByIdOrName(options: IFetchNftsByIdOrNameOptions): Promise<IFetchNftsByIdOrNameResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/explorer/v1/nft/all/" + options.uuid,
+      params: {
+        k: options.tokenId,
+        n: options.tokenName
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    return {
+      code,
+      msg,
+      data: {
+        tokenIds: data.token_id as string[],
+        tokenNames: (data.token_name as string[]).map((t) => {
+          const [name, holder] = t.split("_");
+          return { name, holder };
+        })
+      }
+    };
+  }
+
+  public async fetchNftTransfers(options: IFetchNftTransfersOptions): Promise<IFetchNftTransfersResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/explorer/v1/nft/transfer/" + options.uuid,
+      params: {
+        w: options.address,
+        k: options.tokenId,
+        p: options.page || 0,
+        s: options.size || this.pageSize.TWENTY,
+        t: options.type,
+        b: options.beginTime,
+        e: options.endTime,
+        aw: options.counterparty
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    return {
+      code,
+      msg,
+      data: {
+        count: data.count as number,
+        transfers: (data.list as Record<string, unknown>[]).map((t) => {
+          return {
+            wallet: t.wallet as string,
+            type: t.type as string,
+            time: (t.time as number) * 1000 + this.timeOffset,
+            hash: t.hash as string,
+            block: t.block as number,
+            fee: (t.fee as string) + "",
+            success: t.success as string,
+            seq: t.seq as number,
+            offer: t.offer as number,
+            index: t.index as number,
+            tokenId: t.TokenID as string,
+            flags: t.Flags as number,
+            fundCode: t.FundCode as string,
+            fundCodeName: t.FundCodeName as string,
+            issuer: t.Issuer as string,
+            lowNode: t.LowNode as string,
+            tokenInfos: t.TokenInfos as unknown[],
+            tokenOwner: t.TokenOwner as string,
+            tokenSender: t.TokenSender as string
+          };
+        })
+      }
+    };
+  }
+
+  public async fetchNftConfigs(options: IFetchNftConfigsRequest): Promise<IFetchIssuerNftsResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/explorer/v1/nft/config/" + options.uuid,
+      params: {
+        n: options.fundCodeName,
+        w: options.issuer
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const nfts = (data.list as Record<string, unknown>[]) || [];
+    return {
+      code,
+      msg,
+      data: {
+        nfts: nfts.map((nft) => {
+          return {
+            fundCode: nft.FundCode as string,
+            issuer: nft.Issuer as string,
+            flags: nft.Flags as number,
+            fundCodeName: nft.FundCodeName as string,
+            ledgerIndex: nft.LedgerIndex as string,
+            tokenIssued: nft.TokenIssued as string,
+            tokenSize: nft.TokenSize as string,
+            hash: nft.hash as string,
+            issuerAccountId: nft.issuer_accountid as string,
+            issuerTime: (nft.issuer_time as number) * 1000 + this.timeOffset
+          };
+        })
+      }
+    };
+  }
+
+  public async fetchNftTokenInfo(options: IFetchNftTokenInfoRequest): Promise<IFetchNftTokenInfoResponse> {
+    const res: IResponse = await fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/explorer/v1/nft/tokeninfo/" + options.uuid,
+      params: {
+        k: options.tokenId,
+        w: options.address,
+        p: options.page || 0,
+        s: options.size || this.pageSize.TWENTY,
+        i: options.issuer,
+        n: options.fundCodeName,
+        valid: options.valid
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    return {
+      code,
+      msg,
+      data: {
+        count: data.count as number,
+        nfts: (data.list as Record<string, unknown>[]).map((t) => {
+          return {
+            tokenId: t.TokenID as string,
+            type: t.type as string,
+            time: (t.time as number) * 1000 + this.timeOffset,
+            hash: t.hash as string,
+            block: t.block as number,
+            index: t.index as number,
+            flags: t.Flags as number,
+            fundCode: t.FundCode as string,
+            fundCodeName: t.FundCodeName as string,
+            issuer: t.Issuer as string,
+            lowNode: t.LowNode as string,
+            tokenInfos: t.TokenInfos as unknown[],
+            tokenOwner: t.TokenOwner as string,
+            tokenSender: t.TokenSender as string,
+            ledgerIndex: t.LedgerIndex as string,
+            inservice: t.inservice as number,
+            issuerTime: (t.issuer_time as number) * 1000 + this.timeOffset
+          };
+        })
+      }
+    };
+  }
 }
-
-
