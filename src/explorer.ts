@@ -48,8 +48,11 @@ import {
   IHashDetailInfo,
   IBlockHashDetailInfo,
   IFetchBlockHashTransactionsOptions,
-  IFetchBlockHashTransactionsResponse
+  IFetchBlockHashTransactionsResponse,
+  IFetchNftConfigResponse
 } from "./types";
+import { isDef, isValidNftTransactionType, isValidPage, isValidSize, isValidStatus } from "./util";
+const assert = require("assert");
 
 export default class JCCDexExplorer {
   readonly timeOffset = 946684800000;
@@ -290,14 +293,18 @@ export default class JCCDexExplorer {
   }
 
   public async fetchIssuedNfts(options: IFetchIssuerNftsOptions): Promise<IFetchIssuerNftsResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
     const res: IResponse = await fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/explorer/v1/nft/config/all" + options.uuid,
+      url: "/explorer/v1/nft/config/all/" + options.uuid,
       params: {
         i: options.issuer,
-        p: options.page || 0,
-        s: options.size || this.pageSize.TWENTY
+        p: page,
+        s: size
       }
     });
     const { code, msg, data } = res;
@@ -315,12 +322,11 @@ export default class JCCDexExplorer {
             issuer: nft.Issuer as string,
             flags: nft.Flags as number,
             fundCodeName: nft.FundCodeName as string,
-            ledgerIndex: nft.LedgerIndex as string,
-            tokenIssued: nft.TokenIssued as string,
-            tokenSize: nft.TokenSize as string,
-            hash: nft.hash as string,
-            issuerAccountId: nft.issuer_accountid as string,
-            issuerTime: (nft.issuer_time as number) * 1000 + this.timeOffset
+            count: nft.count as number,
+            destroy: nft.destroy as number,
+            issueCount: nft.issueCount as number,
+            issueDate: nft.issueDate as number,
+            totalCount: nft.totalCount as number
           };
         })
       }
@@ -355,16 +361,24 @@ export default class JCCDexExplorer {
   }
 
   public async fetchNftTransfers(options: IFetchNftTransfersOptions): Promise<IFetchNftTransfersResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const { tokenId, address, type } = options;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(isDef(tokenId) || isDef(address), 'At least one parameter is required in "tokenId, address"');
+    assert(isValidNftTransactionType(type), 'The value of "type" is invalid');
+
     const res: IResponse = await fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/explorer/v1/nft/transfer/" + options.uuid,
       params: {
-        w: options.address,
-        k: options.tokenId,
-        p: options.page || 0,
-        s: options.size || this.pageSize.TWENTY,
-        t: options.type,
+        w: address,
+        k: tokenId,
+        p: page,
+        s: size,
+        t: type,
         b: options.beginTime,
         e: options.endTime,
         aw: options.counterparty
@@ -407,14 +421,15 @@ export default class JCCDexExplorer {
     };
   }
 
-  public async fetchNftConfigs(options: IFetchNftConfigsRequest): Promise<IFetchIssuerNftsResponse> {
+  public async fetchNftConfigs(options: IFetchNftConfigsRequest): Promise<IFetchNftConfigResponse> {
+    const { issuer, fundCodeName, uuid } = options;
     const res: IResponse = await fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/explorer/v1/nft/config/" + options.uuid,
+      url: "/explorer/v1/nft/config/" + uuid,
       params: {
-        n: options.fundCodeName,
-        w: options.issuer
+        n: fundCodeName,
+        w: issuer
       }
     });
     const { code, msg, data } = res;
@@ -446,17 +461,27 @@ export default class JCCDexExplorer {
   }
 
   public async fetchNftTokenInfo(options: IFetchNftTokenInfoRequest): Promise<IFetchNftTokenInfoResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const { tokenId, address, issuer, fundCodeName, valid } = options;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(
+      isDef(tokenId) || isDef(address) || isDef(issuer) || isDef(fundCodeName),
+      'At least one parameter is required in "tokenId, address, issuer, fundCodeName"'
+    );
+    assert(isValidStatus(valid), 'The value of "valid" is invalid');
     const res: IResponse = await fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/explorer/v1/nft/tokeninfo/" + options.uuid,
       params: {
-        k: options.tokenId,
-        w: options.address,
-        p: options.page || 0,
-        s: options.size || this.pageSize.TWENTY,
-        i: options.issuer,
-        n: options.fundCodeName,
+        k: tokenId,
+        w: address,
+        p: page,
+        s: size,
+        i: issuer,
+        n: fundCodeName,
         valid: options.valid
       }
     });

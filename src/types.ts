@@ -263,12 +263,12 @@ export interface IFetchAllBlocksResponse extends IResponse {
 }
 
 export interface IFetchIssuerNftsOptions extends IUUID, IBaseRequest {
-  issuer: string;
+  issuer?: string;
   page?: number;
   size?: PageSize; // page size, default 20
 }
 
-export interface IIssuerNft {
+export interface INft {
   fundCode: string;
   issuer: string;
   /**
@@ -284,9 +284,24 @@ export interface IIssuerNft {
   issuerTime: number;
 }
 
+export interface IIssuedNft {
+  fundCode: string;
+  issuer: string;
+  /**
+   * 0: Valid
+   */
+  flags: number;
+  fundCodeName: string;
+  count: number;
+  destroy: number;
+  issueCount: number;
+  issueDate: number;
+  totalCount: number;
+}
+
 export interface IFetchIssuerNftsResponse extends IResponse {
   data: {
-    nfts: IIssuerNft[];
+    nfts: IIssuedNft[];
   };
 }
 
@@ -354,6 +369,12 @@ export interface IFetchNftTransfersResponse extends IResponse {
 export interface IFetchNftConfigsRequest extends IUUID, IBaseRequest {
   fundCodeName?: string;
   issuer?: string;
+}
+
+export interface IFetchNftConfigResponse extends IResponse {
+  data: {
+    nfts: INft[];
+  };
 }
 
 export enum NFTStatus {
