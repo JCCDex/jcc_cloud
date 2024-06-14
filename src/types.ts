@@ -260,7 +260,7 @@ export interface IFetchAllBlocksResponse extends IResponse {
 }
 
 export interface IFetchIssuerNftsOptions extends IUUID, IBaseRequest {
-  issuer: string;
+  issuer?: string;
   page?: number;
   size?: PageSize; // page size, default 20
 }
