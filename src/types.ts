@@ -211,7 +211,9 @@ export interface IBlockTransaction {
   account: string; // transaction account
   seq: number; // transaction sequence
   fee: number; // transaction gas fee
-  succ: string; // transaction status ("tesSUCCESS" means success)
+  succ?: string; // transaction status ("tesSUCCESS" means success)
+  success: string; // transaction status ("tesSUCCESS" means success)
+  offerSeq?: number; // the sequence number of the canceled order; when type = "OfferCancel"
   memos?: unknown[]; // tansfer memo, when type = "Payment"
   dest?: string; // destination account, when type = "Payment"
   amount?: IToken; // transfer amount, when type = "Payment"
@@ -227,6 +229,7 @@ export interface IBlockTransaction {
 export interface IFetchBlockTransactionsResponse extends IResponse {
   data: {
     transactions: IBlockTransaction[];
+    total: number;
   };
 }
 
@@ -415,3 +418,131 @@ export interface IFetchNftTokenInfoResponse extends IResponse {
     count: number;
   };
 }
+export interface IFetchLatestSixHashOptions extends IUUID, IBaseRequest {}
+
+export interface IHashInfo {
+  _id?: string; // transaction hash
+  hash: string; // transaction hash
+  block: number; // block number
+  time: number; // block close time (ms)
+  type: string; // transaction type
+  account: string; // account who started this transaction
+  succ?: string; // transaction status (tesSUCCESS means success)
+  success: string; // transaction status (tesSUCCESS means success)
+  dest?: string; // destination account, when type = "Payment"
+  amount?: IToken; // transfer amount, when type = "Payment"
+  takerGets?: IToken; // currency and quantity to be paid for this transaction
+  takerPays?: IToken; // currency and quantity to be received for this transaction
+  realGets?: IToken; // actual remaining quantity to be paid of this transaction
+  realPays?: IToken; // actual remaining quantity to be received of this transaction
+  affectedNodes?: IMatchTradeInfo[]; // the matched trades info of this transaction
+  past: number; // the time from now to transaction time (ms)
+  flag?: number; // match trade flags
+}
+
+export interface IFetchLatestSixHashResponse extends IResponse {
+  data: {
+    hashInfos: IHashInfo[];
+  };
+}
+
+export enum TransactionType {
+  ALL = "",
+  OFFERCREATE = "OfferCreate",
+  OFFERCANCEL = "OfferCancel",
+  PAYMENT = "Payment"
+}
+
+export interface IFetchAllHashOptions extends IUUID, IBaseRequest {
+  page?: number; // page default 0
+  size?: PageSize; // page size, default 20
+  beginTime?: string; // the start time for query hash; format: "2021-1-1"
+  endTime?: string; // the end time for query hash; format: "2021-3-31"
+  type?: TransactionType; // transaction type {"OfferCreate", "OfferCancel", "payment"}
+  buyOrSell?: TradeType; // trade type;  1: buy, 2: sell, default 0: all
+  coinPair?: string; // example: "JETH-JUSDT",  "JETH-",  "-JUSDT", "JETH"
+  matchFlag?: number; // match flag; this parameter seems to be invalid in testing
+}
+
+export interface IFetchAllHashResponse extends IResponse {
+  data: {
+    hashInfos: IHashInfo[];
+    total: number;
+  };
+}
+
+export interface IFetchHashDetailOptions extends IUUID, IBaseRequest {
+  hash: string; // need to query hash
+}
+
+export interface IBlockHashDetailInfo {
+  hashType?: number; // the query hash type from res; 1: block hash,  2: transaction hash
+  _id?: string; // transaction hash
+  hash: string; // transaction hash
+  index?: number; // transaction index in block
+  type: string; // transaction type ("Payment", "OfferCreate", "OfferCancel")
+  account: string; // transaction account
+  seq: number; // transaction sequence
+  fee: number; // transaction gas fee
+  succ?: string; // transaction status ("tesSUCCESS" means success)
+  success: string; // transaction status ("tesSUCCESS" means success)
+  offerSeq?: number; // the sequence number of the canceled order; when type = "OfferCancel"
+  memos?: unknown[]; // tansfer memo, when type = "Payment"
+  dest?: string; // destination account, when type = "Payment"
+  amount?: IToken; // transfer amount, when type = "Payment"
+  platform?: string; // platform account, when type = "OfferCreate" | "OfferCancel"
+  takerGets?: IToken; // currency and quantity to be paid for transaction; when type = "OfferCreate" | "OfferCancel"
+  takerPays?: IToken; // currency and quantity to be received for transaction; when type = "OfferCreate" |"OfferCancel"
+  realGets?: IToken; // actual remaining quantity to be paid of this transaction; when type = "OfferCreate"
+  realPays?: IToken; // actual remaining quantity to be received of this transaction; when type = "OfferCreate"
+  brokerage?: IBrokerage; // brokerage info of transaction; when type = "OfferCreate" | "OfferCancel"
+  affectedNodes?: IMatchTradeInfo[];
+  flag?: number; // Active and passive transaction flag
+}
+
+export interface IFetchBlockHashDetailResponse extends IResponse {
+  data: {
+    hashType: number; // the query hash type from res; 1: block hash,  2: transaction hash
+    blockInfo: {
+      blockHash: string;
+      block: number;
+      time: number;
+      past: number;
+      transNum: number;
+      parentHash: string;
+      totalCoins: string;
+    };
+    blockDetails: IBlockHashDetailInfo[];
+    total: number; // the number of transactions in this block
+  };
+}
+
+export interface IHashDetailInfo extends IBlockHashDetailInfo{
+    blockHash: string; // block hash,
+    block: number; // block number,
+    time: number; // transaction time (ms),
+    past?: number; // the time from now to transaction time (ms),
+    flag?: number; // match trade flags,
+    matchGets?: IToken; // currency and quantity to be paid for the match trade; when flag = 1,
+    matchPays?: IToken; // currency and quantity to be received for the match trade; when flag = 1,
+}
+
+export interface IFetchTransHashDetailResponse extends IResponse {
+  data: {
+    hashType: number; // the query hash type from res; 1: block hash,  2: transaction hash
+    hashDetails: IHashDetailInfo;
+  };
+}
+
+export interface IFetchBlockHashTransactionsOptions extends IUUID, IBaseRequest {
+  blockHash: string;
+  page?: number; // page default 0
+  size?: PageSize; // page size, default 20
+}
+
+export interface IFetchBlockHashTransactionsResponse extends IResponse {
+  data: {
+    transactions: IBlockHashDetailInfo[];
+  };
+}
+
