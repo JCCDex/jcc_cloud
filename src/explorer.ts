@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import { CloudError } from "./error";
 import fetch from "./fetch";
 import {
@@ -36,9 +35,11 @@ import {
   IFetchNftTransfersResponse,
   IFetchNftConfigsRequest,
   IFetchNftTokenInfoRequest,
-  IFetchNftTokenInfoResponse
+  IFetchNftTokenInfoResponse,
+  IFetchNftConfigResponse
 } from "./types";
 import { isDef, isValidNftTransactionType, isValidPage, isValidSize, isValidStatus } from "./util";
+const assert = require("assert");
 
 export default class JCCDexExplorer {
   readonly timeOffset = 946684800000;
@@ -284,7 +285,7 @@ export default class JCCDexExplorer {
     const res: IResponse = await fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/explorer/v1/nft/config/all" + options.uuid,
+      url: "/explorer/v1/nft/config/all/" + options.uuid,
       params: {
         i: options.issuer,
         p: page,
@@ -306,12 +307,11 @@ export default class JCCDexExplorer {
             issuer: nft.Issuer as string,
             flags: nft.Flags as number,
             fundCodeName: nft.FundCodeName as string,
-            ledgerIndex: nft.LedgerIndex as string,
-            tokenIssued: nft.TokenIssued as string,
-            tokenSize: nft.TokenSize as string,
-            hash: nft.hash as string,
-            issuerAccountId: nft.issuer_accountid as string,
-            issuerTime: (nft.issuer_time as number) * 1000 + this.timeOffset
+            count: nft.count as number,
+            destroy: nft.destroy as number,
+            issueCount: nft.issueCount as number,
+            issueDate: nft.issueDate as number,
+            totalCount: nft.totalCount as number
           };
         })
       }
@@ -406,7 +406,7 @@ export default class JCCDexExplorer {
     };
   }
 
-  public async fetchNftConfigs(options: IFetchNftConfigsRequest): Promise<IFetchIssuerNftsResponse> {
+  public async fetchNftConfigs(options: IFetchNftConfigsRequest): Promise<IFetchNftConfigResponse> {
     const { issuer, fundCodeName, uuid } = options;
     const res: IResponse = await fetch({
       method: "get",
