@@ -57,6 +57,8 @@ const assert = require("assert");
 export default class JCCDexExplorer {
   readonly timeOffset = 946684800000;
 
+  public fetch;
+
   public orderType = OrderType;
 
   public tradeType = TradeType;
@@ -67,12 +69,9 @@ export default class JCCDexExplorer {
 
   private baseUrl: string;
 
-  constructor(baseUrl: string) {
+  constructor(baseUrl: string, customFetch?: unknown) {
     this.baseUrl = baseUrl;
-  }
-
-  public set timeout(v: number) {
-    fetch.defaults.timeout = v;
+    this.fetch = customFetch || fetch;
   }
 
   public setBaseUrl(baseUrl: string) {
@@ -84,7 +83,7 @@ export default class JCCDexExplorer {
   }
 
   public async fetchBalances(options: IFetchBalancesOptions): Promise<IFetchBalancesResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/wallet/balance/" + options.uuid,
@@ -112,7 +111,7 @@ export default class JCCDexExplorer {
   }
 
   public async fetchOffers(options: IFetchOffersOptions): Promise<IFetchOffersResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/wallet/offer/" + options.uuid,
@@ -138,7 +137,7 @@ export default class JCCDexExplorer {
   }
 
   public async fetchHistoryOrders(options: IFetchHistoryOrdersOptions): Promise<IFetchHistoryOrdersResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/wallet/trans/" + options.uuid,
@@ -167,7 +166,7 @@ export default class JCCDexExplorer {
   }
 
   public async fetchIssuedTokens(options: IFetchIssuedTokensOptions): Promise<IFetchIssuedTokensResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/wallet/fingate_tokenlist/" + options.uuid,
@@ -185,7 +184,7 @@ export default class JCCDexExplorer {
   }
 
   public async fetchHistoryFees(options: IFetchHistoryFeesOptions): Promise<IFetchHistoryFeesResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/wallet/trans/fee/" + options.uuid,
@@ -218,7 +217,7 @@ export default class JCCDexExplorer {
   public async fetchBlockTransactions(
     options: IFetchBlockTransactionsOptions
   ): Promise<IFetchBlockTransactionsResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/block/trans/" + options.uuid,
@@ -246,7 +245,7 @@ export default class JCCDexExplorer {
   }
 
   public async fetchLatestSixBlocks(options: IFetchLatestSixBlocksOptions): Promise<IFetchLatestSixBlocksResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/block/new/" + options.uuid,
@@ -268,7 +267,7 @@ export default class JCCDexExplorer {
   }
 
   public async fetchAllBlocks(options: IFetchAllBlocksOptions): Promise<IFetchAllBlocksResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/block/all/" + options.uuid,
@@ -297,7 +296,7 @@ export default class JCCDexExplorer {
     const size = options.size || this.pageSize.TWENTY;
     assert(isValidPage(page), "Page is invalid");
     assert(isValidSize(size), "Size is invalid");
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/explorer/v1/nft/config/all/" + options.uuid,
@@ -334,7 +333,7 @@ export default class JCCDexExplorer {
   }
 
   public async fetchNftsByIdOrName(options: IFetchNftsByIdOrNameOptions): Promise<IFetchNftsByIdOrNameResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/explorer/v1/nft/all/" + options.uuid,
@@ -369,7 +368,7 @@ export default class JCCDexExplorer {
     assert(isDef(tokenId) || isDef(address), 'At least one parameter is required in "tokenId, address"');
     assert(isValidNftTransactionType(type), 'The value of "type" is invalid');
 
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/explorer/v1/nft/transfer/" + options.uuid,
@@ -423,7 +422,7 @@ export default class JCCDexExplorer {
 
   public async fetchNftConfigs(options: IFetchNftConfigsRequest): Promise<IFetchNftConfigResponse> {
     const { issuer, fundCodeName, uuid } = options;
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/explorer/v1/nft/config/" + uuid,
@@ -471,7 +470,7 @@ export default class JCCDexExplorer {
       'At least one parameter is required in "tokenId, address, issuer, fundCodeName"'
     );
     assert(isValidStatus(valid), 'The value of "valid" is invalid');
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/explorer/v1/nft/tokeninfo/" + options.uuid,
@@ -519,9 +518,8 @@ export default class JCCDexExplorer {
     };
   }
 
-  
   public async fetchLatestSixHash(options: IFetchLatestSixHashOptions): Promise<IFetchLatestSixHashResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/trans/new/" + options.uuid,
@@ -532,9 +530,9 @@ export default class JCCDexExplorer {
       throw new CloudError(code, msg);
     }
 
-    const hashInfos = (data.list as IHashInfo[] || []);
-  
-    hashInfos.forEach(info => {
+    const hashInfos = (data.list as IHashInfo[]) || [];
+
+    hashInfos.forEach((info) => {
       info.hash = info._id;
       delete info._id;
       info.time = info.time * 1000 + this.timeOffset;
@@ -544,7 +542,7 @@ export default class JCCDexExplorer {
   }
 
   public async fetchAllHash(options: IFetchAllHashOptions): Promise<IFetchAllHashResponse> {
-    const res: IResponse = await fetch({
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/trans/all/" + options.uuid,
@@ -564,10 +562,10 @@ export default class JCCDexExplorer {
       throw new CloudError(code, msg);
     }
 
-    const hashInfos = (data.list as IHashInfo[] || []);
-    const total = (data.count as number);
-  
-    hashInfos.forEach(info => {
+    const hashInfos = (data.list as IHashInfo[]) || [];
+    const total = data.count as number;
+
+    hashInfos.forEach((info) => {
       info.hash = info._id;
       info.success = info.succ;
       delete info._id;
@@ -578,8 +576,10 @@ export default class JCCDexExplorer {
     return { code, msg, data: { hashInfos, total } };
   }
 
-  public async fetchHashDetailInfo(options: IFetchHashDetailOptions): Promise<IFetchBlockHashDetailResponse | IFetchTransHashDetailResponse> {
-    const res: IResponse = await fetch({
+  public async fetchHashDetailInfo(
+    options: IFetchHashDetailOptions
+  ): Promise<IFetchBlockHashDetailResponse | IFetchTransHashDetailResponse> {
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/hash/detail/" + options.uuid,
@@ -595,18 +595,21 @@ export default class JCCDexExplorer {
     /** block hash resault */
     if (data.info && data.list && Array.isArray(data.list)) {
       const info = data.info as Record<string, unknown>;
-      return { code, msg, data: {
+      return {
+        code,
+        msg,
+        data: {
           hashType: 1,
           blockInfo: {
             blockHash: info._id as string,
             block: info.block as number,
-            time: info.time as number * 1000 + this.timeOffset,
-            past: info.past as number * 1000,
+            time: (info.time as number) * 1000 + this.timeOffset,
+            past: (info.past as number) * 1000,
             transNum: info.transNum as number,
             parentHash: info.upperHash as string,
             totalCoins: info.totalCoins as string
           },
-          blockDetails: (data.list as IBlockHashDetailInfo[]).map((tInfo)=>{
+          blockDetails: (data.list as IBlockHashDetailInfo[]).map((tInfo) => {
             tInfo.hash = tInfo._id;
             tInfo.success = tInfo.succ;
             return tInfo;
@@ -617,7 +620,7 @@ export default class JCCDexExplorer {
     }
     /** transaction hash resault */
     const hashDetails = {} as IHashDetailInfo;
-  
+
     for (const key in data) {
       const v = data[key];
       switch (key) {
@@ -632,26 +635,31 @@ export default class JCCDexExplorer {
         case "succ":
           hashDetails.success = v as string;
           break;
-        case 'time':
-          hashDetails.time = v as number * 1000 + this.timeOffset;
+        case "time":
+          hashDetails.time = (v as number) * 1000 + this.timeOffset;
           break;
-        case 'past':
-          hashDetails.past = v as number * 1000;
+        case "past":
+          hashDetails.past = (v as number) * 1000;
           break;
         default:
           hashDetails[key] = v;
           break;
       }
     }
-    return { code, msg, data: {
+    return {
+      code,
+      msg,
+      data: {
         hashType: 2,
         hashDetails
-      } 
+      }
     };
   }
 
-  public async fetchBlockTransactionsByHash(options: IFetchBlockHashTransactionsOptions): Promise<IFetchBlockHashTransactionsResponse> {
-    const res: IResponse = await fetch({
+  public async fetchBlockTransactionsByHash(
+    options: IFetchBlockHashTransactionsOptions
+  ): Promise<IFetchBlockHashTransactionsResponse> {
+    const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/hash/trans/" + options.uuid,
@@ -666,9 +674,9 @@ export default class JCCDexExplorer {
     if (!this.isSuccess(code)) {
       throw new CloudError(code, msg);
     }
-    
-    const transactions = (data.list as IBlockHashDetailInfo[] || []);
-    transactions.forEach(trans => {
+
+    const transactions = (data.list as IBlockHashDetailInfo[]) || [];
+    transactions.forEach((trans) => {
       trans.hash = trans._id;
       trans.success = trans.succ;
       delete trans._id;

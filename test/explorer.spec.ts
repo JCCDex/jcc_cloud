@@ -2,13 +2,12 @@ import sinon from "sinon";
 import JCCDexExplorer from "../src/explorer";
 import { CloudError } from "../src/error";
 import { NFTStatus, NftTransactionType, PageSize } from "../src/types";
-const fetch = require("../src/fetch");
 const sandbox = sinon.createSandbox();
 
 describe("test explorer", () => {
   const baseUrl = "https://swtcscan.jccdex.cn";
   const explorer = new JCCDexExplorer(baseUrl);
-  const stub = sandbox.stub(fetch, "default");
+  const stub = sandbox.stub(explorer, "fetch");
   const timeOffset = explorer.timeOffset;
 
   describe("test fetchBalances", () => {
@@ -685,7 +684,7 @@ describe("test explorer", () => {
               }
             }
           ],
-          "count": 3
+          count: 3
         }
       });
       const res = await explorer.fetchBlockTransactions({
@@ -1728,85 +1727,85 @@ describe("test explorer", () => {
         msg: "error"
       });
       try {
-        await explorer.fetchLatestSixHash({uuid: "jGa9J9TkqtBc"});
+        await explorer.fetchLatestSixHash({ uuid: "jGa9J9TkqtBc" });
       } catch (error) {
         expect(error instanceof CloudError).toEqual(true);
         expect(error.code).toEqual("-1");
         expect(error.message).toEqual("error");
       }
-      await expect(
-        explorer.fetchLatestSixHash({uuid: "jGa9J9TkqtBc"})
-      ).rejects.toThrow(new CloudError("-1", "error"));
+      await expect(explorer.fetchLatestSixHash({ uuid: "jGa9J9TkqtBc" })).rejects.toThrow(
+        new CloudError("-1", "error")
+      );
     });
 
     test("should return blocks", async () => {
       stub.resolves({
         code: "0",
         msg: "",
-        "data": {
-          "list": [
+        data: {
+          list: [
             {
-              "_id": "DD59FFB5A193ABF0690C858DFB61B4FA6B6B1BD9D40F3C2C3AED9E4FD69824FE",
-              "block": 28844593,
-              "time": 771611730,
-              "type": "OfferCreate",
-              "account": "jQaznxC3dmKaHKDGVtasrqiL5mFtd5DTuv",
-              "succ": "tesSUCCESS",
-              "takerGets": {
-                  "currency": "JMBOX",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "0.170728102562769"
+              _id: "DD59FFB5A193ABF0690C858DFB61B4FA6B6B1BD9D40F3C2C3AED9E4FD69824FE",
+              block: 28844593,
+              time: 771611730,
+              type: "OfferCreate",
+              account: "jQaznxC3dmKaHKDGVtasrqiL5mFtd5DTuv",
+              succ: "tesSUCCESS",
+              takerGets: {
+                currency: "JMBOX",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.170728102562769"
               },
-              "takerPays": {
-                  "currency": "JJST",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "1.793827527104485"
+              takerPays: {
+                currency: "JJST",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "1.793827527104485"
               },
-              "realGets": {
-                  "currency": "JMBOX",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "0.170728102562769"
+              realGets: {
+                currency: "JMBOX",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.170728102562769"
               },
-              "realPays": {
-                  "currency": "JJST",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "1.793827527104485"
+              realPays: {
+                currency: "JJST",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "1.793827527104485"
               },
-              "past": 10
+              past: 10
             },
             {
-              "_id": "E4107FEE38918287F572CDB688828FB79E68CF0C47ED1F9AB8D93660B48A35F1",
-              "block": 28844593,
-              "time": 771611730,
-              "type": "OfferCreate",
-              "account": "jQaznxC3dmKaHKDGVtasrqiL5mFtd5DTuv",
-              "succ": "tesSUCCESS",
-              "takerGets": {
-                  "currency": "JMBOX",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "0.123293942931793"
+              _id: "E4107FEE38918287F572CDB688828FB79E68CF0C47ED1F9AB8D93660B48A35F1",
+              block: 28844593,
+              time: 771611730,
+              type: "OfferCreate",
+              account: "jQaznxC3dmKaHKDGVtasrqiL5mFtd5DTuv",
+              succ: "tesSUCCESS",
+              takerGets: {
+                currency: "JMBOX",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.123293942931793"
               },
-              "takerPays": {
-                  "currency": "JJST",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "1.303341491121857"
+              takerPays: {
+                currency: "JJST",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "1.303341491121857"
               },
-              "realGets": {
-                  "currency": "JMBOX",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "0.123293942931793"
+              realGets: {
+                currency: "JMBOX",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.123293942931793"
               },
-              "realPays": {
-                  "currency": "JJST",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "1.303341491121857"
+              realPays: {
+                currency: "JJST",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "1.303341491121857"
               },
-              "past": 10
+              past: 10
             }
           ]
         }
       });
-      const res = await explorer.fetchLatestSixHash({uuid: "jGa9J9TkqtBc"});
+      const res = await explorer.fetchLatestSixHash({ uuid: "jGa9J9TkqtBc" });
 
       expect(
         stub.calledOnceWithExactly({
@@ -1825,60 +1824,60 @@ describe("test explorer", () => {
             {
               block: 28844593,
               time: 1718296530000,
-              type: 'OfferCreate',
-              account: 'jQaznxC3dmKaHKDGVtasrqiL5mFtd5DTuv',
-              succ: 'tesSUCCESS',
+              type: "OfferCreate",
+              account: "jQaznxC3dmKaHKDGVtasrqiL5mFtd5DTuv",
+              succ: "tesSUCCESS",
               takerGets: {
-                currency: 'JMBOX',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '0.170728102562769'
+                currency: "JMBOX",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.170728102562769"
               },
               takerPays: {
-                currency: 'JJST',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '1.793827527104485'
+                currency: "JJST",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "1.793827527104485"
               },
               realGets: {
-                currency: 'JMBOX',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '0.170728102562769'
+                currency: "JMBOX",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.170728102562769"
               },
               realPays: {
-                currency: 'JJST',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '1.793827527104485'
+                currency: "JJST",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "1.793827527104485"
               },
               past: 10000,
-              hash: 'DD59FFB5A193ABF0690C858DFB61B4FA6B6B1BD9D40F3C2C3AED9E4FD69824FE'
+              hash: "DD59FFB5A193ABF0690C858DFB61B4FA6B6B1BD9D40F3C2C3AED9E4FD69824FE"
             },
             {
               block: 28844593,
               time: 1718296530000,
-              type: 'OfferCreate',
-              account: 'jQaznxC3dmKaHKDGVtasrqiL5mFtd5DTuv',
-              succ: 'tesSUCCESS',
+              type: "OfferCreate",
+              account: "jQaznxC3dmKaHKDGVtasrqiL5mFtd5DTuv",
+              succ: "tesSUCCESS",
               takerGets: {
-                currency: 'JMBOX',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '0.123293942931793'
+                currency: "JMBOX",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.123293942931793"
               },
               takerPays: {
-                currency: 'JJST',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '1.303341491121857'
+                currency: "JJST",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "1.303341491121857"
               },
               realGets: {
-                currency: 'JMBOX',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '0.123293942931793'
+                currency: "JMBOX",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.123293942931793"
               },
               realPays: {
-                currency: 'JJST',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '1.303341491121857'
+                currency: "JJST",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "1.303341491121857"
               },
               past: 10000,
-              hash: 'E4107FEE38918287F572CDB688828FB79E68CF0C47ED1F9AB8D93660B48A35F1'
+              hash: "E4107FEE38918287F572CDB688828FB79E68CF0C47ED1F9AB8D93660B48A35F1"
             }
           ]
         }
@@ -1897,88 +1896,86 @@ describe("test explorer", () => {
         msg: "error"
       });
       try {
-        await explorer.fetchAllHash({uuid: "jGa9J9TkqtBc"});
+        await explorer.fetchAllHash({ uuid: "jGa9J9TkqtBc" });
       } catch (error) {
         expect(error instanceof CloudError).toEqual(true);
         expect(error.code).toEqual("-1");
         expect(error.message).toEqual("error");
       }
-      await expect(
-        explorer.fetchAllHash({uuid: "jGa9J9TkqtBc"})
-      ).rejects.toThrow(new CloudError("-1", "error"));
+      await expect(explorer.fetchAllHash({ uuid: "jGa9J9TkqtBc" })).rejects.toThrow(new CloudError("-1", "error"));
     });
 
     test("should return hashInfos", async () => {
       stub.resolves({
         code: "0",
         msg: "",
-        "data": {
-          "list": [
+        data: {
+          list: [
             {
-              "_id": "E6CF5244EB3E3C2BF433AE01F49CDC4609DBC6C0F46806A7B81780240E815817",
-              "block": 28844738,
-              "time": 771613180,
-              "type": "OfferCreate",
-              "account": "jBcHrPr3W1tzzLhqjTKXwo2zt4fpm3AaQp",
-              "succ": "tesSUCCESS",
-              "takerGets": {
-                "currency": "JUNI",
-                "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                "value": "0.007165188"
+              _id: "E6CF5244EB3E3C2BF433AE01F49CDC4609DBC6C0F46806A7B81780240E815817",
+              block: 28844738,
+              time: 771613180,
+              type: "OfferCreate",
+              account: "jBcHrPr3W1tzzLhqjTKXwo2zt4fpm3AaQp",
+              succ: "tesSUCCESS",
+              takerGets: {
+                currency: "JUNI",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.007165188"
               },
-              "takerPays": {
-                "currency": "JUSDT",
-                "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                "value": "0.070677414"
+              takerPays: {
+                currency: "JUSDT",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.070677414"
               },
-              "affectedNodes": [
+              affectedNodes: [
                 {
-                  "account": "jaz2J561QDxdd5xkH6rrRtTDhL5ZTrdWm4",
-                  "seq": 37422,
-                  "flags": 0,
-                  "previous": {
-                      "takerGets": {
-                          "currency": "JUSDT",
-                          "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                          "value": "48.68861190148087"
-                      },
-                      "takerPays": {
-                          "currency": "JUNI",
-                          "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                          "value": "4.93599066316716"
-                      }
+                  account: "jaz2J561QDxdd5xkH6rrRtTDhL5ZTrdWm4",
+                  seq: 37422,
+                  flags: 0,
+                  previous: {
+                    takerGets: {
+                      currency: "JUSDT",
+                      issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                      value: "48.68861190148087"
+                    },
+                    takerPays: {
+                      currency: "JUNI",
+                      issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                      value: "4.93599066316716"
+                    }
                   },
-                  "final": {
-                      "takerGets": {
-                          "currency": "JUSDT",
-                          "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                          "value": "48.61793448704887"
-                      },
-                      "takerPays": {
-                          "currency": "JUNI",
-                          "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                          "value": "4.92882547516716"
-                      }
+                  final: {
+                    takerGets: {
+                      currency: "JUSDT",
+                      issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                      value: "48.61793448704887"
+                    },
+                    takerPays: {
+                      currency: "JUNI",
+                      issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                      value: "4.92882547516716"
+                    }
                   },
-                  "brokerage": {
-                      "platform": "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
-                      "feeAccount": "jEZHFAYMZMrYVrqetoK9b8HBv2NE1YjaZN",
-                      "den": 1000,
-                      "num": 2,
-                      "currency": "JUNI",
-                      "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                      "value": "0.000014330376"
+                  brokerage: {
+                    platform: "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
+                    feeAccount: "jEZHFAYMZMrYVrqetoK9b8HBv2NE1YjaZN",
+                    den: 1000,
+                    num: 2,
+                    currency: "JUNI",
+                    issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                    value: "0.000014330376"
                   }
                 }
               ],
-              "past": 10,
-              "flag": 2
+              past: 10,
+              flag: 2
             }
           ],
-          "count": 1000000
+          count: 1000000
         }
       });
-      const res = await explorer.fetchAllHash({uuid: "jGa9J9TkqtBc"});
+      const res = await explorer.fetchAllHash({ uuid: "jGa9J9TkqtBc" });
 
       expect(
         stub.calledOnceWithExactly({
@@ -2004,59 +2001,59 @@ describe("test explorer", () => {
         data: {
           hashInfos: [
             {
-              hash: 'E6CF5244EB3E3C2BF433AE01F49CDC4609DBC6C0F46806A7B81780240E815817',
+              hash: "E6CF5244EB3E3C2BF433AE01F49CDC4609DBC6C0F46806A7B81780240E815817",
               block: 28844738,
               time: 1718297980000,
-              type: 'OfferCreate',
-              account: 'jBcHrPr3W1tzzLhqjTKXwo2zt4fpm3AaQp',
-              success: 'tesSUCCESS',
+              type: "OfferCreate",
+              account: "jBcHrPr3W1tzzLhqjTKXwo2zt4fpm3AaQp",
+              success: "tesSUCCESS",
               takerGets: {
-                currency: 'JUNI',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '0.007165188'
+                currency: "JUNI",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.007165188"
               },
               takerPays: {
-                currency: 'JUSDT',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '0.070677414'
+                currency: "JUSDT",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "0.070677414"
               },
               affectedNodes: [
                 {
-                  account: 'jaz2J561QDxdd5xkH6rrRtTDhL5ZTrdWm4',
+                  account: "jaz2J561QDxdd5xkH6rrRtTDhL5ZTrdWm4",
                   seq: 37422,
                   flags: 0,
                   previous: {
                     takerGets: {
-                      currency: 'JUSDT',
-                      issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                      value: '48.68861190148087'
+                      currency: "JUSDT",
+                      issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                      value: "48.68861190148087"
                     },
                     takerPays: {
-                      currency: 'JUNI',
-                      issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                      value: '4.93599066316716'
+                      currency: "JUNI",
+                      issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                      value: "4.93599066316716"
                     }
                   },
                   final: {
                     takerGets: {
-                      currency: 'JUSDT',
-                      issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                      value: '48.61793448704887'
+                      currency: "JUSDT",
+                      issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                      value: "48.61793448704887"
                     },
                     takerPays: {
-                      currency: 'JUNI',
-                      issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                      value: '4.92882547516716'
+                      currency: "JUNI",
+                      issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                      value: "4.92882547516716"
                     }
                   },
                   brokerage: {
-                    platform: 'jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5',
-                    feeAccount: 'jEZHFAYMZMrYVrqetoK9b8HBv2NE1YjaZN',
+                    platform: "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
+                    feeAccount: "jEZHFAYMZMrYVrqetoK9b8HBv2NE1YjaZN",
                     den: 1000,
                     num: 2,
-                    currency: 'JUNI',
-                    issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                    value: '0.000014330376'
+                    currency: "JUNI",
+                    issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                    value: "0.000014330376"
                   }
                 }
               ],
@@ -2102,48 +2099,48 @@ describe("test explorer", () => {
       stub.resolves({
         code: "0",
         msg: "",
-        "data": {
-          "_id": "1BF9B91C65A43E21B04CD0FBC624BACE916CDC8A5B584DB0AA67F1E8131A42F6",
-          "hashType": 2,
-          "upperHash": "E4E6FADB033CF401CF494B7D047B7FC00F273CDF7C156E94D17C688FBDC01704",
-          "block": 28842246,
-          "time": 771588260,
-          "type": "OfferCreate",
-          "account": "jB6GhwX8QX1NM3YpjAEwPKseHqkMWZKk8K",
-          "seq": 161612,
-          "fee": 0.00001,
-          "succ": "tesSUCCESS",
-          "memos": [
-              {
-                  "Memo": {
-                      "MemoData": ""
-                  }
+        data: {
+          _id: "1BF9B91C65A43E21B04CD0FBC624BACE916CDC8A5B584DB0AA67F1E8131A42F6",
+          hashType: 2,
+          upperHash: "E4E6FADB033CF401CF494B7D047B7FC00F273CDF7C156E94D17C688FBDC01704",
+          block: 28842246,
+          time: 771588260,
+          type: "OfferCreate",
+          account: "jB6GhwX8QX1NM3YpjAEwPKseHqkMWZKk8K",
+          seq: 161612,
+          fee: 0.00001,
+          succ: "tesSUCCESS",
+          memos: [
+            {
+              Memo: {
+                MemoData: ""
               }
+            }
           ],
-          "takerGets": {
-              "currency": "JETH",
-              "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-              "value": "0.002506556601902"
+          takerGets: {
+            currency: "JETH",
+            issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+            value: "0.002506556601902"
           },
-          "takerPays": {
-              "currency": "JUNI",
-              "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-              "value": "0.894973621484745"
+          takerPays: {
+            currency: "JUNI",
+            issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+            value: "0.894973621484745"
           },
-          "platform": "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
-          "realGets": {
-              "currency": "JETH",
-              "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-              "value": "0.002506556601902"
+          platform: "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
+          realGets: {
+            currency: "JETH",
+            issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+            value: "0.002506556601902"
           },
-          "realPays": {
-              "currency": "JUNI",
-              "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-              "value": "0.894973621484745"
+          realPays: {
+            currency: "JUNI",
+            issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+            value: "0.894973621484745"
           },
-          "affectedNodes": [],
-          "past": 18929,
-          "flag": 1
+          affectedNodes: [],
+          past: 18929,
+          flag: 1
         }
       });
       const res = await explorer.fetchHashDetailInfo({
@@ -2168,36 +2165,36 @@ describe("test explorer", () => {
         data: {
           hashType: 2,
           hashDetails: {
-            hash: '1BF9B91C65A43E21B04CD0FBC624BACE916CDC8A5B584DB0AA67F1E8131A42F6',
-            blockHash: 'E4E6FADB033CF401CF494B7D047B7FC00F273CDF7C156E94D17C688FBDC01704',
+            hash: "1BF9B91C65A43E21B04CD0FBC624BACE916CDC8A5B584DB0AA67F1E8131A42F6",
+            blockHash: "E4E6FADB033CF401CF494B7D047B7FC00F273CDF7C156E94D17C688FBDC01704",
             block: 28842246,
             time: 1718273060000,
-            type: 'OfferCreate',
-            account: 'jB6GhwX8QX1NM3YpjAEwPKseHqkMWZKk8K',
+            type: "OfferCreate",
+            account: "jB6GhwX8QX1NM3YpjAEwPKseHqkMWZKk8K",
             seq: 161612,
             fee: 0.00001,
-            success: 'tesSUCCESS',
-            memos: [ { Memo: { MemoData: '' } } ],
+            success: "tesSUCCESS",
+            memos: [{ Memo: { MemoData: "" } }],
             takerGets: {
-              currency: 'JETH',
-              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-              value: '0.002506556601902'
+              currency: "JETH",
+              issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              value: "0.002506556601902"
             },
             takerPays: {
-              currency: 'JUNI',
-              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-              value: '0.894973621484745'
+              currency: "JUNI",
+              issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              value: "0.894973621484745"
             },
-            platform: 'jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5',
+            platform: "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
             realGets: {
-              currency: 'JETH',
-              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-              value: '0.002506556601902'
+              currency: "JETH",
+              issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              value: "0.002506556601902"
             },
             realPays: {
-              currency: 'JUNI',
-              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-              value: '0.894973621484745'
+              currency: "JUNI",
+              issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              value: "0.894973621484745"
             },
             affectedNodes: [],
             past: 18929000,
@@ -2211,69 +2208,69 @@ describe("test explorer", () => {
       stub.resolves({
         code: "0",
         msg: "",
-        "data": {
-          "info": {
-            "_id": "8D9DEB75B007DF54AB0B8E5FE3873C367EF3025B6566E5075DE9AA5C3520B794",
-            "hashType": 1,
-            "upperHash": "",
-            "block": 28842212,
-            "time": 771587920,
-            "transNum": 2,
-            "parentHash": "6385743AA703AAFD795D14FF787F985CDF27F58F87F5AC662D8283360426645F",
-            "totalCoins": "599999999999460713",
-            "past": 20651
+        data: {
+          info: {
+            _id: "8D9DEB75B007DF54AB0B8E5FE3873C367EF3025B6566E5075DE9AA5C3520B794",
+            hashType: 1,
+            upperHash: "",
+            block: 28842212,
+            time: 771587920,
+            transNum: 2,
+            parentHash: "6385743AA703AAFD795D14FF787F985CDF27F58F87F5AC662D8283360426645F",
+            totalCoins: "599999999999460713",
+            past: 20651
           },
-          "list": [
+          list: [
             {
-              "_id": "3816D1F4F6EAAF145ABCC598E454068EA7A2125B6CDBACA213D582607A5D2013",
-              "hashType": 2,
-              "index": 0,
-              "type": "Payment",
-              "account": "jBEXYiEwFD7hEY1DtcWFjDVGqXCtPjzj2p",
-              "seq": 29916,
-              "fee": 0.01,
-              "succ": "tesSUCCESS",
-              "dest": "jMTWocqPdqFbd5UHbD5aizUJ5YfxtcqhP4",
-              "amount": {
-                  "currency": "WTRX",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "444.8086"
+              _id: "3816D1F4F6EAAF145ABCC598E454068EA7A2125B6CDBACA213D582607A5D2013",
+              hashType: 2,
+              index: 0,
+              type: "Payment",
+              account: "jBEXYiEwFD7hEY1DtcWFjDVGqXCtPjzj2p",
+              seq: 29916,
+              fee: 0.01,
+              succ: "tesSUCCESS",
+              dest: "jMTWocqPdqFbd5UHbD5aizUJ5YfxtcqhP4",
+              amount: {
+                currency: "WTRX",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "444.8086"
               }
             },
             {
-              "_id": "7148B37BA0EF0CFB9A3EBE0290979A44E542F01BEAF816D683AC82408CE026FC",
-              "hashType": 2,
-              "index": 1,
-              "type": "OfferCreate",
-              "account": "ja2rF7o54ydxJgwa1Vnf5wmxf2c3UmnB6A",
-              "seq": 28988,
-              "fee": 0.00001,
-              "succ": "tesSUCCESS",
-              "takerGets": {
-                  "currency": "JVEE",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "76.81644921999999"
+              _id: "7148B37BA0EF0CFB9A3EBE0290979A44E542F01BEAF816D683AC82408CE026FC",
+              hashType: 2,
+              index: 1,
+              type: "OfferCreate",
+              account: "ja2rF7o54ydxJgwa1Vnf5wmxf2c3UmnB6A",
+              seq: 28988,
+              fee: 0.00001,
+              succ: "tesSUCCESS",
+              takerGets: {
+                currency: "JVEE",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "76.81644921999999"
               },
-              "takerPays": {
-                  "currency": "SWTC",
-                  "issuer": "",
-                  "value": "57364.65749"
+              takerPays: {
+                currency: "SWTC",
+                issuer: "",
+                value: "57364.65749"
               },
-              "platform": "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
-              "realGets": {
-                  "currency": "JVEE",
-                  "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                  "value": "76.81644921999999"
+              platform: "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
+              realGets: {
+                currency: "JVEE",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "76.81644921999999"
               },
-              "realPays": {
-                  "currency": "SWTC",
-                  "issuer": "",
-                  "value": "57364.65749"
+              realPays: {
+                currency: "SWTC",
+                issuer: "",
+                value: "57364.65749"
               },
-              "flag": 2
+              flag: 2
             }
           ],
-          "count": 2
+          count: 2
         }
       });
       const res = await explorer.fetchHashDetailInfo({
@@ -2298,58 +2295,58 @@ describe("test explorer", () => {
         data: {
           hashType: 1,
           blockInfo: {
-            blockHash: '8D9DEB75B007DF54AB0B8E5FE3873C367EF3025B6566E5075DE9AA5C3520B794',
+            blockHash: "8D9DEB75B007DF54AB0B8E5FE3873C367EF3025B6566E5075DE9AA5C3520B794",
             block: 28842212,
             time: 1718272720000,
             past: 20651000,
             transNum: 2,
-            parentHash: '',
-            totalCoins: '599999999999460713'
+            parentHash: "",
+            totalCoins: "599999999999460713"
           },
           blockDetails: [
             {
-              _id: '3816D1F4F6EAAF145ABCC598E454068EA7A2125B6CDBACA213D582607A5D2013',
+              _id: "3816D1F4F6EAAF145ABCC598E454068EA7A2125B6CDBACA213D582607A5D2013",
               hashType: 2,
               index: 0,
-              type: 'Payment',
-              account: 'jBEXYiEwFD7hEY1DtcWFjDVGqXCtPjzj2p',
+              type: "Payment",
+              account: "jBEXYiEwFD7hEY1DtcWFjDVGqXCtPjzj2p",
               seq: 29916,
               fee: 0.01,
-              succ: 'tesSUCCESS',
-              dest: 'jMTWocqPdqFbd5UHbD5aizUJ5YfxtcqhP4',
+              succ: "tesSUCCESS",
+              dest: "jMTWocqPdqFbd5UHbD5aizUJ5YfxtcqhP4",
               amount: {
-                currency: 'WTRX',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '444.8086'
+                currency: "WTRX",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "444.8086"
               },
-              hash: '3816D1F4F6EAAF145ABCC598E454068EA7A2125B6CDBACA213D582607A5D2013',
-              success: 'tesSUCCESS'
+              hash: "3816D1F4F6EAAF145ABCC598E454068EA7A2125B6CDBACA213D582607A5D2013",
+              success: "tesSUCCESS"
             },
             {
-              _id: '7148B37BA0EF0CFB9A3EBE0290979A44E542F01BEAF816D683AC82408CE026FC',
+              _id: "7148B37BA0EF0CFB9A3EBE0290979A44E542F01BEAF816D683AC82408CE026FC",
               hashType: 2,
               index: 1,
-              type: 'OfferCreate',
-              account: 'ja2rF7o54ydxJgwa1Vnf5wmxf2c3UmnB6A',
+              type: "OfferCreate",
+              account: "ja2rF7o54ydxJgwa1Vnf5wmxf2c3UmnB6A",
               seq: 28988,
               fee: 0.00001,
-              succ: 'tesSUCCESS',
+              succ: "tesSUCCESS",
               takerGets: {
-                currency: 'JVEE',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '76.81644921999999'
+                currency: "JVEE",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "76.81644921999999"
               },
-              takerPays: { currency: 'SWTC', issuer: '', value: '57364.65749' },
-              platform: 'jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5',
+              takerPays: { currency: "SWTC", issuer: "", value: "57364.65749" },
+              platform: "jHbpNVU8sqCmBR5UawKvCQMpEJfFhqUvJ5",
               realGets: {
-                currency: 'JVEE',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '76.81644921999999'
+                currency: "JVEE",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "76.81644921999999"
               },
-              realPays: { currency: 'SWTC', issuer: '', value: '57364.65749' },
+              realPays: { currency: "SWTC", issuer: "", value: "57364.65749" },
               flag: 2,
-              hash: '7148B37BA0EF0CFB9A3EBE0290979A44E542F01BEAF816D683AC82408CE026FC',
-              success: 'tesSUCCESS'
+              hash: "7148B37BA0EF0CFB9A3EBE0290979A44E542F01BEAF816D683AC82408CE026FC",
+              success: "tesSUCCESS"
             }
           ],
           total: 2
@@ -2390,57 +2387,57 @@ describe("test explorer", () => {
       stub.resolves({
         code: "0",
         msg: "",
-        "data": {
-          "list": [
+        data: {
+          list: [
             {
-              "_id": "CF916A61979D702E8F41ADEF8B067476FC6F6BA505754F86D034EDA5E110475D",
-              "hashType": 2,
-              "index": 1,
-              "type": "OfferCreate",
-              "account": "jL7Q26qWtWxZtZUpdEq5KZbuJBXbyuiKpe",
-              "seq": 1386168,
-              "fee": 0.001,
-              "succ": "tesSUCCESS",
-              "takerGets": {
-                "currency": "JUSDT",
-                "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                "value": "19.24"
+              _id: "CF916A61979D702E8F41ADEF8B067476FC6F6BA505754F86D034EDA5E110475D",
+              hashType: 2,
+              index: 1,
+              type: "OfferCreate",
+              account: "jL7Q26qWtWxZtZUpdEq5KZbuJBXbyuiKpe",
+              seq: 1386168,
+              fee: 0.001,
+              succ: "tesSUCCESS",
+              takerGets: {
+                currency: "JUSDT",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "19.24"
               },
-              "takerPays": {
-                "currency": "JUNI",
-                "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                "value": "2"
+              takerPays: {
+                currency: "JUNI",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "2"
               },
-              "realGets": {
-                "currency": "JUSDT",
-                "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                "value": "19.24"
+              realGets: {
+                currency: "JUSDT",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "19.24"
               },
-              "realPays": {
-                "currency": "JUNI",
-                "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                "value": "2"
+              realPays: {
+                currency: "JUNI",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "2"
               },
-              "flag": 1
+              flag: 1
             },
             {
-              "_id": "D857B584C5A3F719B949F08E18DB4B41A209460C4442A19D4FF38A023E9BEF8B",
-              "hashType": 2,
-              "index": 2,
-              "type": "Payment",
-              "account": "jMTWocqPdqFbd5UHbD5aizUJ5YfxtcqhP4",
-              "seq": 1,
-              "fee": 0.01,
-              "succ": "tesSUCCESS",
-              "dest": "jBEXYiEwFD7hEY1DtcWFjDVGqXCtPjzj2p",
-              "amount": {
-                "currency": "WUSDT",
-                "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
-                "value": "51.892851"
+              _id: "D857B584C5A3F719B949F08E18DB4B41A209460C4442A19D4FF38A023E9BEF8B",
+              hashType: 2,
+              index: 2,
+              type: "Payment",
+              account: "jMTWocqPdqFbd5UHbD5aizUJ5YfxtcqhP4",
+              seq: 1,
+              fee: 0.01,
+              succ: "tesSUCCESS",
+              dest: "jBEXYiEwFD7hEY1DtcWFjDVGqXCtPjzj2p",
+              amount: {
+                currency: "WUSDT",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "51.892851"
               }
             }
           ],
-          "count": 1
+          count: 1
         }
       });
       const res = await explorer.fetchBlockTransactionsByHash({
@@ -2470,48 +2467,48 @@ describe("test explorer", () => {
           transactions: [
             {
               index: 1,
-              type: 'OfferCreate',
-              account: 'jL7Q26qWtWxZtZUpdEq5KZbuJBXbyuiKpe',
+              type: "OfferCreate",
+              account: "jL7Q26qWtWxZtZUpdEq5KZbuJBXbyuiKpe",
               seq: 1386168,
               fee: 0.001,
               takerGets: {
-                currency: 'JUSDT',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '19.24'
+                currency: "JUSDT",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "19.24"
               },
               takerPays: {
-                currency: 'JUNI',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '2'
+                currency: "JUNI",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "2"
               },
               realGets: {
-                currency: 'JUSDT',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '19.24'
+                currency: "JUSDT",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "19.24"
               },
               realPays: {
-                currency: 'JUNI',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '2'
+                currency: "JUNI",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "2"
               },
               flag: 1,
-              hash: 'CF916A61979D702E8F41ADEF8B067476FC6F6BA505754F86D034EDA5E110475D',
-              success: 'tesSUCCESS'
+              hash: "CF916A61979D702E8F41ADEF8B067476FC6F6BA505754F86D034EDA5E110475D",
+              success: "tesSUCCESS"
             },
             {
               index: 2,
-              type: 'Payment',
-              account: 'jMTWocqPdqFbd5UHbD5aizUJ5YfxtcqhP4',
+              type: "Payment",
+              account: "jMTWocqPdqFbd5UHbD5aizUJ5YfxtcqhP4",
               seq: 1,
               fee: 0.01,
-              dest: 'jBEXYiEwFD7hEY1DtcWFjDVGqXCtPjzj2p',
+              dest: "jBEXYiEwFD7hEY1DtcWFjDVGqXCtPjzj2p",
               amount: {
-                currency: 'WUSDT',
-                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
-                value: '51.892851'
+                currency: "WUSDT",
+                issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+                value: "51.892851"
               },
-              hash: 'D857B584C5A3F719B949F08E18DB4B41A209460C4442A19D4FF38A023E9BEF8B',
-              success: 'tesSUCCESS'
+              hash: "D857B584C5A3F719B949F08E18DB4B41A209460C4442A19D4FF38A023E9BEF8B",
+              success: "tesSUCCESS"
             }
           ]
         }
