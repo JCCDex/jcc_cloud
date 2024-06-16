@@ -700,7 +700,7 @@ describe("test explorer", () => {
           url: "/block/trans/jGa9J9TkqtBc",
           params: {
             b: 28824756,
-            p: "",
+            p: 0,
             s: 20
           }
         })
@@ -2512,6 +2512,591 @@ describe("test explorer", () => {
               },
               hash: 'D857B584C5A3F719B949F08E18DB4B41A209460C4442A19D4FF38A023E9BEF8B',
               success: 'tesSUCCESS'
+            }
+          ]
+        }
+      });
+    });
+  });
+
+  describe("test fetchTokensInFo", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      try {
+        await explorer.fetchTokensInFo({
+          uuid: "jGa9J9TkqtBc",
+        });
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
+      await expect(
+        explorer.fetchTokensInFo({
+          uuid: "jGa9J9TkqtBc",
+        })
+      ).rejects.toThrow(new CloudError("-1", "error"));
+    });
+
+    test("should return tokens list", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        "data": {
+          "list": [
+            {
+              "count": 3,
+              "isNative": 0,
+              "issueCount": "100.00000000000002",
+              "issueDate": 0,
+              "reserveCount": 0,
+              "destory": 400,
+              "token": "800000000000000000000000F46A84565A538DBA",
+              "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              "holdnum": 3
+            },
+            {
+              "count": 1091,
+              "isNative": 0,
+              "issueCount": "50000000",
+              "issueDate": 619769010,
+              "reserveCount": 50000000,
+              "block": 28460228,
+              "index": 0,
+              "token": "BGT",
+              "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              "holdnum": 1091
+            },
+            {
+              "count": 144,
+              "isNative": 0,
+              "issueCount": "8000000",
+              "issueDate": 583901360,
+              "reserveCount": 8000000,
+              "token": "BIC",
+              "issuer": "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              "holdnum": 144
+            }
+          ],
+          "count": 266
+        }
+      });
+      const res = await explorer.fetchTokensInFo({
+        uuid: "jGa9J9TkqtBc",
+        issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/sum/tokenlist/jGa9J9TkqtBc",
+          params: {
+            p: 0,
+            s: 20,
+            issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+            t: ""
+          }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          tokens: [
+            {
+              isNative: 0,
+              issueCount: '100.00000000000002',
+              issueDate: 0,
+              reserveCount: 0,
+              destory: 400,
+              token: '800000000000000000000000F46A84565A538DBA',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              holdnum: 3
+            },
+            {
+              isNative: 0,
+              issueCount: '50000000',
+              issueDate: 1566453810000,
+              reserveCount: 50000000,
+              block: 28460228,
+              index: 0,
+              token: 'BGT',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              holdnum: 1091
+            },
+            {
+              isNative: 0,
+              issueCount: '8000000',
+              issueDate: 1530586160000,
+              reserveCount: 8000000,
+              token: 'BIC',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              holdnum: 144
+            }
+          ],
+          total: 266
+        }
+      });
+    });
+  });
+
+  describe("test fetchTokensCirculationInfo", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      try {
+        await explorer.fetchTokensCirculationInfo({
+          uuid: "jGa9J9TkqtBc",
+          token: "usdt",
+          issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+        });
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
+      await expect(
+        explorer.fetchTokensCirculationInfo({
+          uuid: "jGa9J9TkqtBc",
+          token: "usdt",
+          issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+        })
+      ).rejects.toThrow(new CloudError("-1", "error"));
+    });
+
+    test("should return token Circulation Info", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        "data": [
+          {"tokens": "JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or"},
+          {"holders": 10},
+          {"totalsupply": 9999856},
+          {"circulation": 8515505.437096},
+          [
+            {"address":"jhgSm1MoEW59XW4ACsfY6HrvTAT2V1nhto","time":771859804,"amount":"4768905.946396"},
+            {"address":"jsk45ksJZUB7durZrLt5e86Eu2gtiXNRN4","time":771859804,"amount":"1484494.562904"},
+            {"address":"j9z82uwmvZ7WUHRrfXWKuRCJiXHXXh9Js","time":771859804,"amount":"1159629.73632"},
+            {"address":"jndp9nGyrrzZxrAZKAhGYyaWLTmadkKuhW","time":771859804,"amount":"998916.43"},
+            {"address":"jse3Ph2DP7zRnBXAXvLduoWr6Fag2iqevH","time":771859804,"amount":"992954.75"},
+            {"address":"jBttJkCeeXPfiL7Wa7gGmC5EKCAYuK3qGS","time":771859804,"amount":"487209.03"},
+            {"address":"jHdWAmh8AAjhjqG7zEDA5RBgAnQHyd2g5m","time":771859804,"amount":"7529.029997848919"},
+            {"address":"jhiVByeeXXtnZAM12niy135o8cjGodPX73","time":771859804,"amount":"5394.34570946168"},
+            {"address":"jP5g6SgvN1FvaWada1ckGBbMoX5NYg7Muz","time":771859804,"amount":"5189.175216809778"},
+            {"address":"jDwJG7YAZagVXmU1ZmXF2ugAmSh1jU83Us","time":771859804,"amount":"5025.057273560223"}
+          ],
+          {"flag": 1},
+          {"issueDate": 611295390}
+        ]
+      });
+      const res = await explorer.fetchTokensCirculationInfo({
+        uuid: "jGa9J9TkqtBc",
+        token: "jusdt",
+        issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+        size: explorer.pageSize.TEN,
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/sum/list/jGa9J9TkqtBc",
+          params: {
+            p: 0,
+            s: 10,
+            t: "JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or"
+          }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          tokenInfo:{
+            token: 'JUSDT',
+            issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+            holders: 10,
+            totalsupply: 9999856,
+            circulation: 8515505.437096,
+            flag: 1,
+            issueDate: 1557980190000,
+            holdersList: [
+              {
+                address: 'jhgSm1MoEW59XW4ACsfY6HrvTAT2V1nhto',
+                amount: '4768905.946396',
+                time: 1718544604000
+              },
+              {
+                address: 'jsk45ksJZUB7durZrLt5e86Eu2gtiXNRN4',
+                amount: '1484494.562904',
+                time: 1718544604000
+              },
+              {
+                address: 'j9z82uwmvZ7WUHRrfXWKuRCJiXHXXh9Js',
+                amount: '1159629.73632',
+                time: 1718544604000
+              },
+              {
+                address: 'jndp9nGyrrzZxrAZKAhGYyaWLTmadkKuhW',
+                amount: '998916.43',
+                time: 1718544604000
+              },
+              {
+                address: 'jse3Ph2DP7zRnBXAXvLduoWr6Fag2iqevH',
+                amount: '992954.75',
+                time: 1718544604000
+              },
+              {
+                address: 'jBttJkCeeXPfiL7Wa7gGmC5EKCAYuK3qGS',
+                amount: '487209.03',
+                time: 1718544604000
+              },
+              {
+                address: 'jHdWAmh8AAjhjqG7zEDA5RBgAnQHyd2g5m',
+                amount: '7529.029997848919',
+                time: 1718544604000
+              },
+              {
+                address: 'jhiVByeeXXtnZAM12niy135o8cjGodPX73',
+                amount: '5394.34570946168',
+                time: 1718544604000
+              },
+              {
+                address: 'jP5g6SgvN1FvaWada1ckGBbMoX5NYg7Muz',
+                amount: '5189.175216809778',
+                time: 1718544604000
+              },
+              {
+                address: 'jDwJG7YAZagVXmU1ZmXF2ugAmSh1jU83Us',
+                amount: '5025.057273560223',
+                time: 1718544604000
+              }
+            ]
+          }
+        }
+      });
+    });
+  });
+
+  describe("test fetchTokensList", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      try {
+        await explorer.fetchTokensList({
+          uuid: "jGa9J9TkqtBc",
+          keyword: "usdt"
+        });
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
+      await expect(
+        explorer.fetchTokensList({
+          uuid: "jGa9J9TkqtBc",
+          keyword: "usdt"
+        })
+      ).rejects.toThrow(new CloudError("-1", "error"));
+    });
+
+    test("should return token list by keyword", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "成功",
+        "data": [
+          "JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+          "SUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+          "TUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+          "WUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or"
+        ]
+      });
+      const res = await explorer.fetchTokensList({
+        uuid: "jGa9J9TkqtBc",
+        keyword: "usdt"
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/sum/all/jGa9J9TkqtBc",
+          params: { t: "USDT" }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "成功",
+        data: {
+          type: 1,
+          tokens: [
+            { token: 'JUSDT', issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or' },
+            { token: 'SUSDT', issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or' },
+            { token: 'TUSDT', issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or' },
+            { token: 'WUSDT', issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or' }
+          ]
+        }
+      });
+    });
+    
+    test("should return all token list when no keyword", async () => {
+      stub.resolves({
+        "code": "0",
+        "msg": "成功",
+        "data": [
+          {
+            "P":[
+              "PVS_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              "PBLW_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              "PHT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              "PC0001_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or"
+            ]
+          },
+          {
+            "V":[
+              "VCC_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              "VIS_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or",
+              "VST_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or"
+            ]
+          }
+        ]
+      });
+      const res = await explorer.fetchTokensList({
+        uuid: "jGa9J9TkqtBc"
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/sum/all/jGa9J9TkqtBc",
+          params: { t: "" }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "成功",
+        data: {
+          type: 0,
+          tokens: [
+            {
+              firstLetter: 'P',
+              list: [
+                {
+                  token: 'PVS',
+                  issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or'
+                },
+                {
+                  token: 'PBLW',
+                  issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or'
+                },
+                {
+                  token: 'PHT',
+                  issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or'
+                },
+                {
+                  token: 'PC0001',
+                  issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or'
+                }
+              ]
+            },
+            {
+              firstLetter: 'V',
+              list: [
+                {
+                  token: 'VCC',
+                  issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or'
+                },
+                {
+                  token: 'VIS',
+                  issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or'
+                },
+                {
+                  token: 'VST',
+                  issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or'
+                }
+              ]
+            }
+          ]
+        }
+      });
+    });
+  });
+
+  describe("test fetchTokensTradeStatistic", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      try {
+        await explorer.fetchTokensTradeStatistic({
+          uuid: "jGa9J9TkqtBc"
+        });
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
+      await expect(
+        explorer.fetchTokensTradeStatistic({
+          uuid: "jGa9J9TkqtBc"
+        })
+      ).rejects.toThrow(new CloudError("-1", "error"));
+    });
+
+    test("should return statistic parts list", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        "data": [
+          {"bTime":764092800,"type":2,"bBlock":28092704,"eBlock":28101343,"eTime":764179200,"transNum":56543},
+          {"bTime":764179200,"type":2,"bBlock":28101344,"eBlock":28109983,"eTime":764265600,"transNum":45878},
+          {"bTime":764265600,"type":2,"bBlock":28109984,"eBlock":28118623,"eTime":764352000,"transNum":59179}
+        ]
+      });
+      const res = await explorer.fetchTokensTradeStatistic({
+        uuid: "jGa9J9TkqtBc"
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/sum/trans_num/jGa9J9TkqtBc",
+          params: {}
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          list: [
+            {
+              bBlock: 28092704,
+              bTime: 1710777600000,
+              eBlock: 28101343,
+              eTime: 1710864000000,
+              transNum: 56543,
+              type: 2
+            },
+            {
+              bBlock: 28101344,
+              bTime: 1710864000000,
+              eBlock: 28109983,
+              eTime: 1710950400000,
+              transNum: 45878,
+              type: 2
+            },
+            {
+              bBlock: 28109984,
+              bTime: 1710950400000,
+              eBlock: 28118623,
+              eTime: 1711036800000,
+              transNum: 59179,
+              type: 2
+            }
+          ]
+        }
+      });
+    });
+  });
+
+  describe("test fetchNewUserStatistic", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      try {
+        await explorer.fetchNewUserStatistic({
+          uuid: "jGa9J9TkqtBc"
+        });
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
+      await expect(
+        explorer.fetchNewUserStatistic({
+          uuid: "jGa9J9TkqtBc"
+        })
+      ).rejects.toThrow(new CloudError("-1", "error"));
+    });
+
+    test("should return statistic parts list", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        "data": [
+          {"bTime":764092800,"type":2,"eTime":764179200,"userNum":20,"total":3739780},
+          {"bTime":764179200,"type":2,"eTime":764265600,"userNum":0,"total":3739780}
+        ]
+      });
+      const res = await explorer.fetchNewUserStatistic({
+        uuid: "jGa9J9TkqtBc"
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/sum/users_num/jGa9J9TkqtBc",
+          params: {}
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          list: [
+            {
+              bTime: 1710777600000,
+              eTime: 1710864000000,
+              total: 3739780,
+              userNum: 20,
+              type: 2
+            },
+            {
+              bTime: 1710864000000,
+              eTime: 1710950400000,
+              total: 3739780,
+              userNum: 0,
+              type: 2
             }
           ]
         }

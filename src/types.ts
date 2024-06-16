@@ -546,3 +546,117 @@ export interface IFetchBlockHashTransactionsResponse extends IResponse {
   };
 }
 
+export interface IFetchTokensOptions extends IUUID, IBaseRequest {
+  page?: number;  // page default 0
+  size?: PageSize; // page size, default 20
+  issuer?: string; // token issuer
+  token?: string; // token name, this parameter is seem to be invalid in testing
+}
+
+export interface ITokenInfo {
+  count?: number; // the number of token holders
+  block?: number; // the block number of token
+  index?: number; // the index in block
+  isNative: number; // 1: native token, 0: non-native token
+  issueCount: string; // the number of issued tokens
+  issueDate: number; // the issue date of token
+  reserveCount: number; // the number of reserved tokens
+  destory?: number; // the number of destroyed tokens
+  token: string; // token name
+  issuer: string; // token issuer,
+  holdnum: number; // the number of token holders
+}
+
+export interface IFetchTokensResponse extends IResponse {
+  data: {
+    tokens: ITokenInfo[];
+    total: number;
+  };
+}
+
+export interface IFetchTokensCirculationOptions extends IUUID, IBaseRequest {
+  token: string; // token name
+  issuer: string; // token issuer
+  page?: number; // holder list page, default 0
+  size?: PageSize; // show holder list size, default 20
+}
+
+export interface ITokenCirculationInfo {
+  token: string; // token name
+  issuer: string; // token issuer
+  issueDate: number; // the issue date of token
+  totalsupply: string; // the num of total issued of token
+  circulation: string; // the num of total circulation of token
+  holders: number; // the number of token holders
+  holdersList: { // the list of token holders
+    address: string; // token holder address
+    amount: string; // the amount of hold token
+    time: number; // the time of statistics
+  }[];
+  flag: number; // the token status
+}
+
+export interface IFetchTokensCirculationResponse extends IResponse {
+  data: {
+    tokenInfo: ITokenCirculationInfo;
+  };
+}
+
+export interface IFetchTokensListOptions extends IUUID, IBaseRequest {
+  keyword?: string; // the token keyword for query
+}
+
+export interface ITokenName {
+  token: string; // token name
+  issuer: string; // token issuer
+}
+
+export interface IFetchTokensListResponse extends IResponse {
+  data: {
+    type: number; // list type, 0: all token list, 1: token list by keyword
+    tokens: ITokenName[];
+  };
+}
+
+export interface IFetchAllTokensListResponse extends IResponse {
+  data: {
+    type: number; // list type, 0: all token list, 1: token list by keyword
+    tokens: {
+        firstLetter: string; // the first letter of token name
+        list: ITokenName[];
+      }[];
+  }
+}
+
+export interface IFetchTokenTradeStatisticOptions extends IUUID, IBaseRequest {}
+
+export interface ITradeStatistic {
+  bBlock: number; // begin block number of statistics
+  bTime: number; // begin time of statistics
+  eBlock: number; // end block number of statistics
+  eTime: number; // end time of statistics
+  transNum: number; // the number of all transactions in statistics
+  type: number; // unknown -_-!
+}
+
+export interface IFetchTokenTradeStatisticResponse extends IResponse {
+  data: {
+    list: ITradeStatistic[];
+  };
+}
+
+export interface IFetchUserStatisticOptions extends IUUID, IBaseRequest {}
+
+export interface IUserStatistic {
+  bTime: number; // begin time of statistics,
+  eTime: number; // end time of statistics,
+  total: number; // the number of all user in statistics
+  userNum: number; // the number of new users added in statistics
+  type: number; // unknown too -_-!
+}
+
+export interface IFetchUserStatisticResponse extends IResponse {
+  data: {
+    list: IUserStatistic[];
+  }
+}
