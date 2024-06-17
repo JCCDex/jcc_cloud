@@ -130,3 +130,4 @@ dist
 .pnp.*
 # ignore test files
 fetchTest.ts
+lib
