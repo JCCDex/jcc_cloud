@@ -64,9 +64,18 @@ import {
   ITradeStatistic,
   IFetchUserStatisticOptions,
   IFetchUserStatisticResponse,
-  IUserStatistic,
+  IUserStatistic
 } from "./types";
-import { isDef, isValidNftTransactionType, isValidPage, isValidSize, isValidStatus, isValidTransactionType, isValidTradeType, isValidOrderType } from "./util";
+import {
+  isDef,
+  isValidNftTransactionType,
+  isValidPage,
+  isValidSize,
+  isValidStatus,
+  isValidTransactionType,
+  isValidTradeType,
+  isValidOrderType
+} from "./util";
 const assert = require("assert");
 
 export default class JCCDexExplorer {
@@ -593,7 +602,7 @@ export default class JCCDexExplorer {
   public async fetchAllHash(options: IFetchAllHashOptions): Promise<IFetchAllHashResponse> {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
-    const type = options.type || this.transactionType.ALL
+    const type = options.type || this.transactionType.ALL;
     const tradeType = options.buyOrSell || this.tradeType.ALL;
     assert(isValidPage(page), "Page is invalid");
     assert(isValidSize(size), "Size is invalid");
@@ -679,38 +688,25 @@ export default class JCCDexExplorer {
     }
     /** transaction hash resault */
     const hashDetails = {} as IHashDetailInfo;
+    hashDetails.hash = data._id as string;
+    hashDetails.success = data.succ as string;
+    hashDetails.time = (data.time as number) * 1000 + this.timeOffset;
+    hashDetails.past = (data.past as number) * 1000;
+    hashDetails.blockHash = data.upperHash as string;
+    delete data._id;
+    delete data.succ;
+    delete data.upperHash;
+    delete data.hashType;
 
-    for (const key in data) {
-      const v = data[key];
-      switch (key) {
-        case "hashType":
-          continue;
-        case "_id":
-          hashDetails.hash = v as string;
-          break;
-        case "upperHash":
-          hashDetails.blockHash = v as string;
-          break;
-        case "succ":
-          hashDetails.success = v as string;
-          break;
-        case "time":
-          hashDetails.time = (v as number) * 1000 + this.timeOffset;
-          break;
-        case "past":
-          hashDetails.past = (v as number) * 1000;
-          break;
-        default:
-          hashDetails[key] = v;
-          break;
-      }
-    }
     return {
       code,
       msg,
       data: {
         hashType: 2,
-        hashDetails
+        hashDetails: {
+          ...data,
+          ...hashDetails
+        }
       }
     };
   }
@@ -739,9 +735,9 @@ export default class JCCDexExplorer {
     if (!this.isSuccess(code)) {
       throw new CloudError(code, msg);
     }
-    
-    const transactions = (data.list as IBlockHashDetailInfo[] || []);
-    transactions.forEach(trans => {
+
+    const transactions = (data.list as IBlockHashDetailInfo[]) || [];
+    transactions.forEach((trans) => {
       trans.hash = trans._id;
       trans.success = trans.succ;
       delete trans._id;
@@ -751,7 +747,9 @@ export default class JCCDexExplorer {
     return { code, msg, data: { transactions } };
   }
 
-  public async fetchTokensInfoByIssuer(options: IFetchBlockHashTransactionsOptions): Promise<IFetchBlockHashTransactionsResponse> {
+  public async fetchTokensInfoByIssuer(
+    options: IFetchBlockHashTransactionsOptions
+  ): Promise<IFetchBlockHashTransactionsResponse> {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
     const hash = options.blockHash;
@@ -806,24 +804,26 @@ export default class JCCDexExplorer {
     if (!this.isSuccess(code)) {
       throw new CloudError(code, msg);
     }
-    const tokens = (data.list as ITokenInfo[] || []);
-    tokens.forEach(t => {
+    const tokens = (data.list as ITokenInfo[]) || [];
+    tokens.forEach((t) => {
       if (t.issueDate > 0) {
         t.issueDate = t.issueDate * 1000 + this.timeOffset;
       }
       delete t.count;
     });
-    return { code, msg, data: { tokens, total: data.count as number }};
-  };
-  
-  public async fetchTokensCirculationInfo(options: IFetchTokensCirculationOptions): Promise<IFetchTokensCirculationResponse>{
+    return { code, msg, data: { tokens, total: data.count as number } };
+  }
+
+  public async fetchTokensCirculationInfo(
+    options: IFetchTokensCirculationOptions
+  ): Promise<IFetchTokensCirculationResponse> {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
-    const {token, issuer} = options;
+    const { token, issuer } = options;
     assert(isValidPage(page), "Page is invalid");
     assert(isValidSize(size), "Size is invalid");
     assert(isDef(token) && token !== "", "Token is invalid");
-    if (!issuer){
+    if (!issuer) {
       assert(token.toUpperCase().startsWith("SWT"), "Issuer is invalid");
     }
     const res: IResponse = await this.fetch({
@@ -833,7 +833,7 @@ export default class JCCDexExplorer {
       params: {
         p: page,
         s: size,
-        t: token.toUpperCase() + "_" + issuer,
+        t: token.toUpperCase() + "_" + issuer
       }
     });
 
@@ -863,16 +863,18 @@ export default class JCCDexExplorer {
           return {
             address: h.address as string,
             amount: h.amount as string,
-            time: h.time as number * 1000 + this.timeOffset
+            time: (h.time as number) * 1000 + this.timeOffset
           };
         });
       }
     });
-    
-    return { code, msg, data: { tokenInfo }};
-  };
-  
-  public async fetchTokensList(options: IFetchTokensListOptions): Promise<IFetchTokensListResponse | IFetchAllTokensListResponse> {
+
+    return { code, msg, data: { tokenInfo } };
+  }
+
+  public async fetchTokensList(
+    options: IFetchTokensListOptions
+  ): Promise<IFetchTokensListResponse | IFetchAllTokensListResponse> {
     const keyword = options.keyword || "";
     assert(typeof keyword === "string", "keyword is invalid");
     const res: IResponse = await this.fetch({
@@ -899,24 +901,26 @@ export default class JCCDexExplorer {
             firstLetter: key,
             list: (v[key] as Array<string>).map((name) => {
               const [token, issuer] = name.split("_");
-              return { token, issuer};
+              return { token, issuer };
             })
           });
         }
       });
     } else {
-    /** return include keywords token list */
+      /** return include keywords token list */
       type = 1;
       tokens = (Object.values(data) as Array<string>).map((name) => {
         const [token, issuer] = name.split("_");
         return { token, issuer };
       });
     }
-    
-    return { code, msg, data: { type,  tokens }};
-  };
 
-  public async fetchTokensTradeStatistic(options: IFetchTokenTradeStatisticOptions): Promise<IFetchTokenTradeStatisticResponse> {
+    return { code, msg, data: { type, tokens } };
+  }
+
+  public async fetchTokensTradeStatistic(
+    options: IFetchTokenTradeStatisticOptions
+  ): Promise<IFetchTokenTradeStatisticResponse> {
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
@@ -937,10 +941,10 @@ export default class JCCDexExplorer {
         eTime: v.eTime * 1000 + this.timeOffset,
         transNum: v.transNum,
         type: v.type
-      }
+      };
     });
-    return { code, msg, data: { list }};
-  };
+    return { code, msg, data: { list } };
+  }
 
   public async fetchNewUserStatistic(options: IFetchUserStatisticOptions): Promise<IFetchUserStatisticResponse> {
     const res: IResponse = await this.fetch({
@@ -962,8 +966,8 @@ export default class JCCDexExplorer {
         total: v.total,
         userNum: v.userNum,
         type: v.type
-      }
+      };
     });
-    return { code, msg, data: { list }};
-  };
+    return { code, msg, data: { list } };
+  }
 }
