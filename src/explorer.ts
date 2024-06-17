@@ -49,9 +49,24 @@ import {
   IBlockHashDetailInfo,
   IFetchBlockHashTransactionsOptions,
   IFetchBlockHashTransactionsResponse,
-  IFetchNftConfigResponse
+  IFetchNftConfigResponse,
+  IFetchTokensOptions,
+  IFetchTokensResponse,
+  ITokenInfo,
+  IFetchTokensCirculationOptions,
+  IFetchTokensCirculationResponse,
+  ITokenCirculationInfo,
+  IFetchTokensListOptions,
+  IFetchTokensListResponse,
+  IFetchAllTokensListResponse,
+  IFetchTokenTradeStatisticOptions,
+  IFetchTokenTradeStatisticResponse,
+  ITradeStatistic,
+  IFetchUserStatisticOptions,
+  IFetchUserStatisticResponse,
+  IUserStatistic,
 } from "./types";
-import { isDef, isValidNftTransactionType, isValidPage, isValidSize, isValidStatus } from "./util";
+import { isDef, isValidNftTransactionType, isValidPage, isValidSize, isValidStatus, isValidTransactionType, isValidTradeType, isValidOrderType } from "./util";
 const assert = require("assert");
 
 export default class JCCDexExplorer {
@@ -83,12 +98,14 @@ export default class JCCDexExplorer {
   }
 
   public async fetchBalances(options: IFetchBalancesOptions): Promise<IFetchBalancesResponse> {
+    const address = options.address;
+    assert(isDef(address) && address !== "", "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/wallet/balance/" + options.uuid,
       params: {
-        w: options.address
+        w: address
       }
     });
     const { code, msg, data } = res;
@@ -111,16 +128,24 @@ export default class JCCDexExplorer {
   }
 
   public async fetchOffers(options: IFetchOffersOptions): Promise<IFetchOffersResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const buyOrSell = options.buyOrSell || this.tradeType.ALL;
+    const address = options.address;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(isValidTradeType(buyOrSell), "buyOrSell is invalid");
+    assert(isDef(address) && address !== "", "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/wallet/offer/" + options.uuid,
       params: {
-        w: options.address,
-        p: options.page || 0,
-        s: options.size || this.pageSize.TWENTY,
+        w: address,
+        p: page,
+        s: size,
         c: options.coinPair || "",
-        bs: options.buyOrSell || this.tradeType.ALL
+        bs: buyOrSell
       }
     });
     const { code, msg, data } = res;
@@ -137,19 +162,27 @@ export default class JCCDexExplorer {
   }
 
   public async fetchHistoryOrders(options: IFetchHistoryOrdersOptions): Promise<IFetchHistoryOrdersResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const buyOrSell = options.buyOrSell || this.tradeType.ALL;
+    const type = options.type || this.orderType.ALL;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(isValidTradeType(buyOrSell), "buyOrSell is invalid");
+    assert(isValidOrderType(type), "type is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/wallet/trans/" + options.uuid,
       params: {
         w: options.address,
-        p: options.page || 0,
-        s: options.size || this.pageSize.TWENTY,
+        p: page,
+        s: size,
         b: options.beginTime || "",
         e: options.endTime || "",
-        t: options.type || this.orderType.ALL,
+        t: type,
         c: options.coinPair || "",
-        bs: options.buyOrSell || this.tradeType.ALL
+        bs: buyOrSell
       }
     });
     const { code, msg, data } = res;
@@ -184,14 +217,20 @@ export default class JCCDexExplorer {
   }
 
   public async fetchHistoryFees(options: IFetchHistoryFeesOptions): Promise<IFetchHistoryFeesResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const address = options.address;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(isDef(address) && address !== "", "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/wallet/trans/fee/" + options.uuid,
       params: {
-        w: options.address,
-        p: options.page || 0,
-        s: options.size || this.pageSize.TWENTY,
+        w: address,
+        p: page,
+        s: size,
         b: options.beginTime || "",
         e: options.endTime || "",
         c: options.tokenAndIssuer || "",
@@ -217,14 +256,20 @@ export default class JCCDexExplorer {
   public async fetchBlockTransactions(
     options: IFetchBlockTransactionsOptions
   ): Promise<IFetchBlockTransactionsResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const block = options.blockNumber;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(typeof block === "number" && block > 0, "Block number is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/block/trans/" + options.uuid,
       params: {
-        b: options.blockNumber,
-        p: options.page || "",
-        s: options.size || this.pageSize.TWENTY
+        b: block,
+        p: page,
+        s: size
       }
     });
     const { code, msg, data } = res;
@@ -267,13 +312,17 @@ export default class JCCDexExplorer {
   }
 
   public async fetchAllBlocks(options: IFetchAllBlocksOptions): Promise<IFetchAllBlocksResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/block/all/" + options.uuid,
       params: {
-        p: options.page || 0,
-        s: options.size || this.pageSize.TWENTY
+        p: page,
+        s: size
       }
     });
     const { code, msg, data } = res;
@@ -542,17 +591,25 @@ export default class JCCDexExplorer {
   }
 
   public async fetchAllHash(options: IFetchAllHashOptions): Promise<IFetchAllHashResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const type = options.type || this.transactionType.ALL
+    const tradeType = options.buyOrSell || this.tradeType.ALL;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(isValidTransactionType(type), "Type is invalid");
+    assert(isValidTradeType(tradeType), "buyOrSell is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/trans/all/" + options.uuid,
       params: {
-        p: options.page || 0,
-        s: options.size || this.pageSize.TWENTY,
+        p: page,
+        s: size,
         b: options.beginTime || "",
         e: options.endTime || "",
-        t: options.type || this.transactionType.ALL,
-        bs: options.buyOrSell || this.tradeType.ALL,
+        t: type,
+        bs: tradeType,
         c: options.coinPair || "",
         f: options.matchFlag || ""
       }
@@ -579,12 +636,14 @@ export default class JCCDexExplorer {
   public async fetchHashDetailInfo(
     options: IFetchHashDetailOptions
   ): Promise<IFetchBlockHashDetailResponse | IFetchTransHashDetailResponse> {
+    const hash = options.hash;
+    assert(isDef(hash) && hash !== "", "Hash is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/hash/detail/" + options.uuid,
       params: {
-        h: options.hash
+        h: hash
       }
     });
     const { code, msg, data } = res;
@@ -659,14 +718,54 @@ export default class JCCDexExplorer {
   public async fetchBlockTransactionsByHash(
     options: IFetchBlockHashTransactionsOptions
   ): Promise<IFetchBlockHashTransactionsResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const hash = options.blockHash;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(isDef(hash) && hash !== "", "Hash is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/hash/trans/" + options.uuid,
       params: {
-        h: options.blockHash,
-        p: options.page || 0,
-        s: options.size || this.pageSize.TWENTY,
+        h: hash,
+        p: page,
+        s: size,
+        n: 1 // this parameter seems to be bug, must be greater than 0
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    
+    const transactions = (data.list as IBlockHashDetailInfo[] || []);
+    transactions.forEach(trans => {
+      trans.hash = trans._id;
+      trans.success = trans.succ;
+      delete trans._id;
+      delete trans.succ;
+      delete trans.hashType;
+    });
+    return { code, msg, data: { transactions } };
+  }
+
+  public async fetchTokensInfoByIssuer(options: IFetchBlockHashTransactionsOptions): Promise<IFetchBlockHashTransactionsResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const hash = options.blockHash;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(isDef(hash) && hash !== "", "Hash is invalid");
+    const res: IResponse = await this.fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/sum/tokenlist/" + options.uuid,
+      params: {
+        h: hash,
+        p: page,
+        s: size,
         n: 1 // this parameter seems to be bug, must be greater than 0
       }
     });
@@ -685,4 +784,186 @@ export default class JCCDexExplorer {
     });
     return { code, msg, data: { transactions } };
   }
+
+  public async fetchTokensInFo(options: IFetchTokensOptions): Promise<IFetchTokensResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    const res: IResponse = await this.fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/sum/tokenlist/" + options.uuid,
+      params: {
+        p: page,
+        s: size,
+        issuer: options.issuer || "",
+        t: options.token || "" // this parameter seems to be bug
+      }
+    });
+
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    const tokens = (data.list as ITokenInfo[] || []);
+    tokens.forEach(t => {
+      if (t.issueDate > 0) {
+        t.issueDate = t.issueDate * 1000 + this.timeOffset;
+      }
+      delete t.count;
+    });
+    return { code, msg, data: { tokens, total: data.count as number }};
+  };
+  
+  public async fetchTokensCirculationInfo(options: IFetchTokensCirculationOptions): Promise<IFetchTokensCirculationResponse>{
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const {token, issuer} = options;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(isDef(token) && token !== "", "Token is invalid");
+    if (!issuer){
+      assert(token.toUpperCase().startsWith("SWT"), "Issuer is invalid");
+    }
+    const res: IResponse = await this.fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/sum/list/" + options.uuid,
+      params: {
+        p: page,
+        s: size,
+        t: token.toUpperCase() + "_" + issuer,
+      }
+    });
+
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const tokenInfo = {} as ITokenCirculationInfo;
+    tokenInfo.holdersList = [];
+    (Object.values(data) as Array<unknown>).forEach((v) => {
+      if (typeof v !== "object") return;
+      if (!Array.isArray(v)) {
+        for (const key in v) {
+          if (key === "tokens") {
+            const [token, issuer] = v[key].split("_");
+            tokenInfo.token = token as string;
+            tokenInfo.issuer = issuer as string;
+          } else if (key === "issueDate") {
+            tokenInfo[key] = v[key] * 1000 + this.timeOffset;
+          } else {
+            tokenInfo[key] = v[key];
+          }
+        }
+      } else if (v.length > 0 && typeof v[0] === "object") {
+        tokenInfo.holdersList = v.map((h) => {
+          return {
+            address: h.address as string,
+            amount: h.amount as string,
+            time: h.time as number * 1000 + this.timeOffset
+          };
+        });
+      }
+    });
+    
+    return { code, msg, data: { tokenInfo }};
+  };
+  
+  public async fetchTokensList(options: IFetchTokensListOptions): Promise<IFetchTokensListResponse | IFetchAllTokensListResponse> {
+    const keyword = options.keyword || "";
+    assert(typeof keyword === "string", "keyword is invalid");
+    const res: IResponse = await this.fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/sum/all/" + options.uuid,
+      params: {
+        t: keyword.toUpperCase()
+      }
+    });
+
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    let type = 0;
+    let tokens = [];
+    /** return all token list */
+    if (keyword === "") {
+      (Object.values(data) as Array<unknown>).forEach((v) => {
+        for (const key in v as Record<string, unknown>) {
+          tokens.push({
+            firstLetter: key,
+            list: (v[key] as Array<string>).map((name) => {
+              const [token, issuer] = name.split("_");
+              return { token, issuer};
+            })
+          });
+        }
+      });
+    } else {
+    /** return include keywords token list */
+      type = 1;
+      tokens = (Object.values(data) as Array<string>).map((name) => {
+        const [token, issuer] = name.split("_");
+        return { token, issuer };
+      });
+    }
+    
+    return { code, msg, data: { type,  tokens }};
+  };
+
+  public async fetchTokensTradeStatistic(options: IFetchTokenTradeStatisticOptions): Promise<IFetchTokenTradeStatisticResponse> {
+    const res: IResponse = await this.fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/sum/trans_num/" + options.uuid,
+      params: {}
+    });
+
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const list = (Object.values(data) as Array<ITradeStatistic>).map((v) => {
+      return {
+        bBlock: v.bBlock as number,
+        bTime: v.bTime * 1000 + this.timeOffset,
+        eBlock: v.eBlock,
+        eTime: v.eTime * 1000 + this.timeOffset,
+        transNum: v.transNum,
+        type: v.type
+      }
+    });
+    return { code, msg, data: { list }};
+  };
+
+  public async fetchNewUserStatistic(options: IFetchUserStatisticOptions): Promise<IFetchUserStatisticResponse> {
+    const res: IResponse = await this.fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/sum/users_num/" + options.uuid,
+      params: {}
+    });
+
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+
+    const list = (Object.values(data) as Array<IUserStatistic>).map((v) => {
+      return {
+        bTime: v.bTime * 1000 + this.timeOffset,
+        eTime: v.eTime * 1000 + this.timeOffset,
+        total: v.total,
+        userNum: v.userNum,
+        type: v.type
+      }
+    });
+    return { code, msg, data: { list }};
+  };
 }

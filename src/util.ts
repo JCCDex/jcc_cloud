@@ -1,4 +1,4 @@
-import { NFTStatus, NftTransactionType, PageSize } from "./types";
+import { NFTStatus, NftTransactionType, PageSize, TransactionType, TradeType, OrderType } from "./types";
 
 export const isDef = (v) => {
   return v !== undefined && v !== null;
@@ -24,3 +24,15 @@ export const isValidNftTransactionType = (v) => {
     NftTransactionType.TransferToken === v
   );
 };
+
+export const isValidTransactionType = (v) => {
+  return TransactionType.ALL === v || TransactionType.OFFERCANCEL === v || TransactionType.OFFERCREATE === v || TransactionType.PAYMENT === v; 
+}
+
+export const isValidTradeType = (v) => {
+  return TradeType.ALL === v || TradeType.BUY === v || TradeType.SELL === v;
+};
+
+export const isValidOrderType = (v) => {
+  return OrderType.ALL === v || OrderType.OFFERCANCEL === v || OrderType.OFFERCREATE === v || OrderType.OFFERAFFECT === v || OrderType.RECEIVE === v || OrderType.SEND === v;
+}
