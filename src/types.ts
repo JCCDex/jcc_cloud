@@ -517,14 +517,14 @@ export interface IFetchBlockHashDetailResponse extends IResponse {
   };
 }
 
-export interface IHashDetailInfo extends IBlockHashDetailInfo{
-    blockHash: string; // block hash,
-    block: number; // block number,
-    time: number; // transaction time (ms),
-    past?: number; // the time from now to transaction time (ms),
-    flag?: number; // match trade flags,
-    matchGets?: IToken; // currency and quantity to be paid for the match trade; when flag = 1,
-    matchPays?: IToken; // currency and quantity to be received for the match trade; when flag = 1,
+export interface IHashDetailInfo extends IBlockHashDetailInfo {
+  blockHash: string; // block hash,
+  block: number; // block number,
+  time: number; // transaction time (ms),
+  past?: number; // the time from now to transaction time (ms),
+  flag?: number; // match trade flags,
+  matchGets?: IToken; // currency and quantity to be paid for the match trade; when flag = 1,
+  matchPays?: IToken; // currency and quantity to be received for the match trade; when flag = 1,
 }
 
 export interface IFetchTransHashDetailResponse extends IResponse {
@@ -547,7 +547,7 @@ export interface IFetchBlockHashTransactionsResponse extends IResponse {
 }
 
 export interface IFetchTokensOptions extends IUUID, IBaseRequest {
-  page?: number;  // page default 0
+  page?: number; // page default 0
   size?: PageSize; // page size, default 20
   issuer?: string; // token issuer
   token?: string; // token name, this parameter is seem to be invalid in testing
@@ -588,7 +588,8 @@ export interface ITokenCirculationInfo {
   totalsupply: string; // the num of total issued of token
   circulation: string; // the num of total circulation of token
   holders: number; // the number of token holders
-  holdersList: { // the list of token holders
+  holdersList: {
+    // the list of token holders
     address: string; // token holder address
     amount: string; // the amount of hold token
     time: number; // the time of statistics
@@ -622,10 +623,10 @@ export interface IFetchAllTokensListResponse extends IResponse {
   data: {
     type: number; // list type, 0: all token list, 1: token list by keyword
     tokens: {
-        firstLetter: string; // the first letter of token name
-        list: ITokenName[];
-      }[];
-  }
+      firstLetter: string; // the first letter of token name
+      list: ITokenName[];
+    }[];
+  };
 }
 
 export interface IFetchTokenTradeStatisticOptions extends IUUID, IBaseRequest {}
@@ -658,5 +659,23 @@ export interface IUserStatistic {
 export interface IFetchUserStatisticResponse extends IResponse {
   data: {
     list: IUserStatistic[];
-  }
+  };
+}
+
+export interface IFetchTokenBalanceStatisticOptions extends IUUID, IBaseRequest {
+  token: string;
+  page?: number;
+  size?: PageSize;
+  beginTime?: string;
+  endTime?: string;
+  address: string;
+}
+
+export interface IFetchTokenBalanceStatisticResponse extends IResponse {
+  data: {
+    balances: {
+      date: string;
+      value: string;
+    }[];
+  };
 }

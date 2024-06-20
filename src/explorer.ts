@@ -64,7 +64,9 @@ import {
   ITradeStatistic,
   IFetchUserStatisticOptions,
   IFetchUserStatisticResponse,
-  IUserStatistic
+  IUserStatistic,
+  IFetchTokenBalanceStatisticOptions,
+  IFetchTokenBalanceStatisticResponse
 } from "./types";
 import {
   isDef,
@@ -74,13 +76,13 @@ import {
   isValidStatus,
   isValidTransactionType,
   isValidTradeType,
-  isValidOrderType
+  isValidOrderType,
+  convertTime,
+  convertTimeToDate
 } from "./util";
 const assert = require("assert");
 
 export default class JCCDexExplorer {
-  readonly timeOffset = 946684800000;
-
   public fetch;
 
   public orderType = OrderType;
@@ -164,7 +166,7 @@ export default class JCCDexExplorer {
 
     const offers = (data.list as IOffer[]) || [];
     offers.forEach((offer) => {
-      offer.time = offer.time * 1000 + this.timeOffset;
+      offer.time = convertTime(offer.time);
       offer.past = offer.past * 1000;
     });
     return { code, msg, data: { offers } };
@@ -201,7 +203,7 @@ export default class JCCDexExplorer {
 
     const historOrders = (data.list as IHistoryOrder[]) || [];
     historOrders.forEach((order) => {
-      order.time = order.time * 1000 + this.timeOffset;
+      order.time = convertTime(order.time);
       order.past = order.past * 1000;
     });
     return { code, msg, data: { historOrders } };
@@ -257,7 +259,7 @@ export default class JCCDexExplorer {
       const [currency, issuer] = fee.currency.split("_");
       fee.currency = currency;
       fee.issuer = issuer || "";
-      fee.time = fee.time * 1000 + this.timeOffset;
+      fee.time = convertTime(fee.time);
     });
     return { code, msg, data: { fees } };
   }
@@ -293,7 +295,7 @@ export default class JCCDexExplorer {
       transaction.blockHash = transaction.upperHash;
       delete transaction._id;
       delete transaction.upperHash;
-      transaction.time = transaction.time * 1000 + this.timeOffset;
+      transaction.time = convertTime(transaction.time);
     });
     return { code, msg, data: { transactions, total: data.count as number } };
   }
@@ -314,7 +316,7 @@ export default class JCCDexExplorer {
     blocks.forEach((block) => {
       block.block = block._id;
       delete block._id;
-      block.time = block.time * 1000 + this.timeOffset;
+      block.time = convertTime(block.time);
       block.past = block.past * 1000;
     });
     return { code, msg, data: { blocks } };
@@ -343,7 +345,7 @@ export default class JCCDexExplorer {
     blocks.forEach((block) => {
       block.block = block._id;
       delete block._id;
-      block.time = block.time * 1000 + this.timeOffset;
+      block.time = convertTime(block.time);
       block.past = block.past * 1000;
     });
     return { code, msg, data: { blocks } };
@@ -455,7 +457,7 @@ export default class JCCDexExplorer {
           return {
             wallet: t.wallet as string,
             type: t.type as string,
-            time: (t.time as number) * 1000 + this.timeOffset,
+            time: convertTime(t.time as number),
             hash: t.hash as string,
             block: t.block as number,
             fee: (t.fee as string) + "",
@@ -510,7 +512,7 @@ export default class JCCDexExplorer {
             tokenSize: nft.TokenSize as string,
             hash: nft.hash as string,
             issuerAccountId: nft.issuer_accountid as string,
-            issuerTime: (nft.issuer_time as number) * 1000 + this.timeOffset
+            issuerTime: convertTime(nft.issuer_time as number)
           };
         })
       }
@@ -555,7 +557,7 @@ export default class JCCDexExplorer {
           return {
             tokenId: t.TokenID as string,
             type: t.type as string,
-            time: (t.time as number) * 1000 + this.timeOffset,
+            time: convertTime(t.time as number),
             hash: t.hash as string,
             block: t.block as number,
             index: t.index as number,
@@ -569,7 +571,7 @@ export default class JCCDexExplorer {
             tokenSender: t.TokenSender as string,
             ledgerIndex: t.LedgerIndex as string,
             inservice: t.inservice as number,
-            issuerTime: (t.issuer_time as number) * 1000 + this.timeOffset
+            issuerTime: convertTime(t.issuer_time as number)
           };
         })
       }
@@ -593,7 +595,7 @@ export default class JCCDexExplorer {
     hashInfos.forEach((info) => {
       info.hash = info._id;
       delete info._id;
-      info.time = info.time * 1000 + this.timeOffset;
+      info.time = convertTime(info.time);
       info.past = info.past * 1000;
     });
     return { code, msg, data: { hashInfos } };
@@ -636,7 +638,7 @@ export default class JCCDexExplorer {
       info.success = info.succ;
       delete info._id;
       delete info.succ;
-      info.time = info.time * 1000 + this.timeOffset;
+      info.time = convertTime(info.time);
       info.past = info.past * 1000;
     });
     return { code, msg, data: { hashInfos, total } };
@@ -671,7 +673,7 @@ export default class JCCDexExplorer {
           blockInfo: {
             blockHash: info._id as string,
             block: info.block as number,
-            time: (info.time as number) * 1000 + this.timeOffset,
+            time: convertTime(info.time as number),
             past: (info.past as number) * 1000,
             transNum: info.transNum as number,
             parentHash: info.upperHash as string,
@@ -690,7 +692,7 @@ export default class JCCDexExplorer {
     const hashDetails = {} as IHashDetailInfo;
     hashDetails.hash = data._id as string;
     hashDetails.success = data.succ as string;
-    hashDetails.time = (data.time as number) * 1000 + this.timeOffset;
+    hashDetails.time = convertTime(data.time as number);
     hashDetails.past = (data.past as number) * 1000;
     hashDetails.blockHash = data.upperHash as string;
     delete data._id;
@@ -807,7 +809,7 @@ export default class JCCDexExplorer {
     const tokens = (data.list as ITokenInfo[]) || [];
     tokens.forEach((t) => {
       if (t.issueDate > 0) {
-        t.issueDate = t.issueDate * 1000 + this.timeOffset;
+        t.issueDate = convertTime(t.issueDate);
       }
       delete t.count;
     });
@@ -853,7 +855,7 @@ export default class JCCDexExplorer {
             tokenInfo.token = token as string;
             tokenInfo.issuer = issuer as string;
           } else if (key === "issueDate") {
-            tokenInfo[key] = v[key] * 1000 + this.timeOffset;
+            tokenInfo[key] = convertTime(v[key]);
           } else {
             tokenInfo[key] = v[key];
           }
@@ -863,7 +865,7 @@ export default class JCCDexExplorer {
           return {
             address: h.address as string,
             amount: h.amount as string,
-            time: (h.time as number) * 1000 + this.timeOffset
+            time: convertTime(h.time as number)
           };
         });
       }
@@ -936,9 +938,9 @@ export default class JCCDexExplorer {
     const list = (Object.values(data) as Array<ITradeStatistic>).map((v) => {
       return {
         bBlock: v.bBlock as number,
-        bTime: v.bTime * 1000 + this.timeOffset,
+        bTime: convertTime(v.bTime),
         eBlock: v.eBlock,
-        eTime: v.eTime * 1000 + this.timeOffset,
+        eTime: convertTime(v.eTime),
         transNum: v.transNum,
         type: v.type
       };
@@ -961,13 +963,56 @@ export default class JCCDexExplorer {
 
     const list = (Object.values(data) as Array<IUserStatistic>).map((v) => {
       return {
-        bTime: v.bTime * 1000 + this.timeOffset,
-        eTime: v.eTime * 1000 + this.timeOffset,
+        bTime: convertTime(v.bTime),
+        eTime: convertTime(v.eTime),
         total: v.total,
         userNum: v.userNum,
         type: v.type
       };
     });
     return { code, msg, data: { list } };
+  }
+
+  public async fetchTokenBalanceStatistic(
+    options: IFetchTokenBalanceStatisticOptions
+  ): Promise<IFetchTokenBalanceStatisticResponse> {
+    const page = options.page || 0;
+    const size = options.size || this.pageSize.TWENTY;
+    const { address, token, beginTime, endTime } = options;
+    assert(isValidPage(page), "Page is invalid");
+    assert(isValidSize(size), "Size is invalid");
+    assert(isDef(address) && address !== "", "Address is invalid");
+    assert(isDef(token) && token !== "", "Token is invalid");
+    const res: IResponse = await this.fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/sum/profit/balance/" + options.uuid,
+      params: {
+        w: address,
+        t: token,
+        p: page,
+        s: size,
+        b: beginTime,
+        e: endTime
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    const values = Object.values(data?.[0] || {})?.[0] || [];
+    return {
+      code,
+      msg,
+      data: {
+        balances: values.map((v) => {
+          const [date, value] = Object.values(v);
+          return {
+            date: convertTimeToDate(date as number),
+            value: (value["value"] as string) || (value as string)
+          };
+        })
+      }
+    };
   }
 }
