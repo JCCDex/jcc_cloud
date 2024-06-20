@@ -674,7 +674,7 @@ export interface IFetchTokenBalanceStatisticOptions extends IUUID, IBaseRequest 
 export interface IFetchTokenBalanceStatisticResponse extends IResponse {
   data: {
     balances: {
-      date: string;
+      time: number;
       value: string;
     }[];
   };

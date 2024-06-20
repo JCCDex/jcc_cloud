@@ -77,8 +77,7 @@ import {
   isValidTransactionType,
   isValidTradeType,
   isValidOrderType,
-  convertTime,
-  convertTimeToDate
+  convertTime
 } from "./util";
 const assert = require("assert");
 
@@ -1008,7 +1007,7 @@ export default class JCCDexExplorer {
         balances: values.map((v) => {
           const [date, value] = Object.values(v);
           return {
-            date: convertTimeToDate(date as number),
+            time: convertTime(date as number),
             value: (value["value"] as string) || (value as string)
           };
         })
