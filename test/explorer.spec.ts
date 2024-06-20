@@ -3155,275 +3155,275 @@ describe("test explorer", () => {
         })
       ).rejects.toThrow(new Error("Address is invalid"));
     });
-  });
 
-  test("should return statistic list", async () => {
-    stub.resolves({
-      code: "0",
-      data: [
-        {
-          SWTC: [
-            { createdTime: 772128000, SWTC: { value: "6077782.517467", ownerCount: 296, seq: 2185233 } },
-            { createdTime: 772041600, SWTC: { value: "6077798.557467", ownerCount: 220, seq: 2183629 } },
-            { createdTime: 771955200, SWTC: { value: "6077848.607467", ownerCount: 594, seq: 2178624 } },
-            { createdTime: 771868800, SWTC: { value: "6077921.117467", ownerCount: 270, seq: 2171373 } },
-            { createdTime: 771782400, SWTC: { value: "6077967.487467", ownerCount: 277, seq: 2166736 } },
-            { createdTime: 771696000, SWTC: { value: "6077989.287467", ownerCount: 166, seq: 2164556 } },
-            { createdTime: 771609600, SWTC: { value: "6078024.417467", ownerCount: 287, seq: 2161043 } },
-            { createdTime: 771523200, SWTC: { value: "6078050.857467", ownerCount: 164, seq: 2158399 } },
-            { createdTime: 771436800, SWTC: { value: "6078086.707467", ownerCount: 223, seq: 2154814 } },
-            { createdTime: 771350400, SWTC: { value: "6078117.827467", ownerCount: 527, seq: 2151702 } },
-            { createdTime: 771264000, SWTC: { value: "6078166.667467", ownerCount: 281, seq: 2146818 } },
-            { createdTime: 771177600, SWTC: { value: "6078189.157467", ownerCount: 135, seq: 2144569 } },
-            { createdTime: 771091200, SWTC: { value: "6078234.297467", ownerCount: 466, seq: 2140055 } },
-            { createdTime: 771004800, SWTC: { value: "6078295.287467", ownerCount: 200, seq: 2133956 } },
-            { createdTime: 770918400, SWTC: { value: "6078307.037467", ownerCount: 112, seq: 2132781 } },
-            { createdTime: 770832000, SWTC: { value: "6078338.207467", ownerCount: 550, seq: 2129664 } },
-            { createdTime: 770745600, SWTC: { value: "6078384.647467", ownerCount: 288, seq: 2125020 } },
-            { createdTime: 770659200, SWTC: { value: "6078413.347467", ownerCount: 90, seq: 2122150 } },
-            { createdTime: 770572800, SWTC: { value: "6078455.057467", ownerCount: 442, seq: 2117979 } },
-            { createdTime: 770486400, SWTC: { value: "6078477.107467", ownerCount: 334, seq: 2115774 } }
+    test("should return statistic list", async () => {
+      stub.resolves({
+        code: "0",
+        data: [
+          {
+            SWTC: [
+              { createdTime: 772128000, SWTC: { value: "6077782.517467", ownerCount: 296, seq: 2185233 } },
+              { createdTime: 772041600, SWTC: { value: "6077798.557467", ownerCount: 220, seq: 2183629 } },
+              { createdTime: 771955200, SWTC: { value: "6077848.607467", ownerCount: 594, seq: 2178624 } },
+              { createdTime: 771868800, SWTC: { value: "6077921.117467", ownerCount: 270, seq: 2171373 } },
+              { createdTime: 771782400, SWTC: { value: "6077967.487467", ownerCount: 277, seq: 2166736 } },
+              { createdTime: 771696000, SWTC: { value: "6077989.287467", ownerCount: 166, seq: 2164556 } },
+              { createdTime: 771609600, SWTC: { value: "6078024.417467", ownerCount: 287, seq: 2161043 } },
+              { createdTime: 771523200, SWTC: { value: "6078050.857467", ownerCount: 164, seq: 2158399 } },
+              { createdTime: 771436800, SWTC: { value: "6078086.707467", ownerCount: 223, seq: 2154814 } },
+              { createdTime: 771350400, SWTC: { value: "6078117.827467", ownerCount: 527, seq: 2151702 } },
+              { createdTime: 771264000, SWTC: { value: "6078166.667467", ownerCount: 281, seq: 2146818 } },
+              { createdTime: 771177600, SWTC: { value: "6078189.157467", ownerCount: 135, seq: 2144569 } },
+              { createdTime: 771091200, SWTC: { value: "6078234.297467", ownerCount: 466, seq: 2140055 } },
+              { createdTime: 771004800, SWTC: { value: "6078295.287467", ownerCount: 200, seq: 2133956 } },
+              { createdTime: 770918400, SWTC: { value: "6078307.037467", ownerCount: 112, seq: 2132781 } },
+              { createdTime: 770832000, SWTC: { value: "6078338.207467", ownerCount: 550, seq: 2129664 } },
+              { createdTime: 770745600, SWTC: { value: "6078384.647467", ownerCount: 288, seq: 2125020 } },
+              { createdTime: 770659200, SWTC: { value: "6078413.347467", ownerCount: 90, seq: 2122150 } },
+              { createdTime: 770572800, SWTC: { value: "6078455.057467", ownerCount: 442, seq: 2117979 } },
+              { createdTime: 770486400, SWTC: { value: "6078477.107467", ownerCount: 334, seq: 2115774 } }
+            ]
+          }
+        ],
+        msg: ""
+      });
+      const res = await explorer.fetchTokenBalanceStatistic({
+        uuid: "jGa9J9TkqtBc",
+        address: "jMO2eYX5z4j8b2FVU4k4zvQfZzgY",
+        token: "swt"
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/sum/profit/balance/jGa9J9TkqtBc",
+          params: {
+            w: "jMO2eYX5z4j8b2FVU4k4zvQfZzgY",
+            t: "swt",
+            p: 0,
+            s: 20,
+            b: undefined,
+            e: undefined
+          }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          balances: [
+            {
+              date: "2024-06-20",
+              value: "6077782.517467"
+            },
+            {
+              date: "2024-06-19",
+              value: "6077798.557467"
+            },
+            {
+              date: "2024-06-18",
+              value: "6077848.607467"
+            },
+            {
+              date: "2024-06-17",
+              value: "6077921.117467"
+            },
+            {
+              date: "2024-06-16",
+              value: "6077967.487467"
+            },
+            {
+              date: "2024-06-15",
+              value: "6077989.287467"
+            },
+            {
+              date: "2024-06-14",
+              value: "6078024.417467"
+            },
+            {
+              date: "2024-06-13",
+              value: "6078050.857467"
+            },
+            {
+              date: "2024-06-12",
+              value: "6078086.707467"
+            },
+            {
+              date: "2024-06-11",
+              value: "6078117.827467"
+            },
+            {
+              date: "2024-06-10",
+              value: "6078166.667467"
+            },
+            {
+              date: "2024-06-09",
+              value: "6078189.157467"
+            },
+            {
+              date: "2024-06-08",
+              value: "6078234.297467"
+            },
+            {
+              date: "2024-06-07",
+              value: "6078295.287467"
+            },
+            {
+              date: "2024-06-06",
+              value: "6078307.037467"
+            },
+            {
+              date: "2024-06-05",
+              value: "6078338.207467"
+            },
+            {
+              date: "2024-06-04",
+              value: "6078384.647467"
+            },
+            {
+              date: "2024-06-03",
+              value: "6078413.347467"
+            },
+            {
+              date: "2024-06-02",
+              value: "6078455.057467"
+            },
+            {
+              date: "2024-06-01",
+              value: "6078477.107467"
+            }
           ]
         }
-      ],
-      msg: ""
-    });
-    const res = await explorer.fetchTokenBalanceStatistic({
-      uuid: "jGa9J9TkqtBc",
-      address: "jMO2eYX5z4j8b2FVU4k4zvQfZzgY",
-      token: "swt"
+      });
     });
 
-    expect(
-      stub.calledOnceWithExactly({
-        method: "get",
-        baseURL: "https://swtcscan.jccdex.cn",
-        url: "/sum/profit/balance/jGa9J9TkqtBc",
-        params: {
-          w: "jMO2eYX5z4j8b2FVU4k4zvQfZzgY",
-          t: "swt",
-          p: 0,
-          s: 20,
-          b: undefined,
-          e: undefined
-        }
-      })
-    ).toEqual(true);
-
-    expect(res).toEqual({
-      code: "0",
-      msg: "",
-      data: {
-        balances: [
+    test("should return statistic list", async () => {
+      stub.resolves({
+        code: "0",
+        data: [
           {
-            date: "2024-06-20",
-            value: "6077782.517467"
-          },
-          {
-            date: "2024-06-19",
-            value: "6077798.557467"
-          },
-          {
-            date: "2024-06-18",
-            value: "6077848.607467"
-          },
-          {
-            date: "2024-06-17",
-            value: "6077921.117467"
-          },
-          {
-            date: "2024-06-16",
-            value: "6077967.487467"
-          },
-          {
-            date: "2024-06-15",
-            value: "6077989.287467"
-          },
-          {
-            date: "2024-06-14",
-            value: "6078024.417467"
-          },
-          {
-            date: "2024-06-13",
-            value: "6078050.857467"
-          },
-          {
-            date: "2024-06-12",
-            value: "6078086.707467"
-          },
-          {
-            date: "2024-06-11",
-            value: "6078117.827467"
-          },
-          {
-            date: "2024-06-10",
-            value: "6078166.667467"
-          },
-          {
-            date: "2024-06-09",
-            value: "6078189.157467"
-          },
-          {
-            date: "2024-06-08",
-            value: "6078234.297467"
-          },
-          {
-            date: "2024-06-07",
-            value: "6078295.287467"
-          },
-          {
-            date: "2024-06-06",
-            value: "6078307.037467"
-          },
-          {
-            date: "2024-06-05",
-            value: "6078338.207467"
-          },
-          {
-            date: "2024-06-04",
-            value: "6078384.647467"
-          },
-          {
-            date: "2024-06-03",
-            value: "6078413.347467"
-          },
-          {
-            date: "2024-06-02",
-            value: "6078455.057467"
-          },
-          {
-            date: "2024-06-01",
-            value: "6078477.107467"
+            JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: [
+              { createdTime: 772128000, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1610.430558312638" },
+              { createdTime: 772041600, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1606.169046642324" },
+              { createdTime: 771955200, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1585.193063176591" },
+              { createdTime: 771868800, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1542.454595797282" },
+              { createdTime: 771782400, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1518.288063528697" },
+              { createdTime: 771696000, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1517.506715823822" },
+              { createdTime: 771609600, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1502.779280686739" },
+              { createdTime: 771523200, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1479.24934468004" },
+              { createdTime: 771436800, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1465.159485836139" },
+              { createdTime: 771350400, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1449.204219592905" },
+              { createdTime: 771264000, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1449.005851372628" },
+              { createdTime: 771177600, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1436.512186442034" },
+              { createdTime: 771091200, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1418.086563214109" },
+              { createdTime: 771004800, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1351.332986472478" },
+              { createdTime: 770918400, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1344.649687277967" },
+              { createdTime: 770832000, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1336.776486876738" },
+              { createdTime: 770745600, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1269.337049428888" },
+              { createdTime: 770659200, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1252.943147200277" },
+              { createdTime: 770572800, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1233.048877496459" },
+              { createdTime: 770486400, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1221.753962288614" }
+            ]
           }
-        ]
-      }
-    });
-  });
+        ],
+        msg: ""
+      });
+      const res = await explorer.fetchTokenBalanceStatistic({
+        uuid: "jGa9J9TkqtBc",
+        address: "jMO2eYX5z4j8b2FVU4k4zvQfZzgY",
+        token: "JUSDT"
+      });
 
-  test("should return statistic list", async () => {
-    stub.resolves({
-      code: "0",
-      data: [
-        {
-          JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: [
-            { createdTime: 772128000, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1610.430558312638" },
-            { createdTime: 772041600, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1606.169046642324" },
-            { createdTime: 771955200, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1585.193063176591" },
-            { createdTime: 771868800, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1542.454595797282" },
-            { createdTime: 771782400, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1518.288063528697" },
-            { createdTime: 771696000, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1517.506715823822" },
-            { createdTime: 771609600, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1502.779280686739" },
-            { createdTime: 771523200, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1479.24934468004" },
-            { createdTime: 771436800, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1465.159485836139" },
-            { createdTime: 771350400, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1449.204219592905" },
-            { createdTime: 771264000, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1449.005851372628" },
-            { createdTime: 771177600, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1436.512186442034" },
-            { createdTime: 771091200, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1418.086563214109" },
-            { createdTime: 771004800, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1351.332986472478" },
-            { createdTime: 770918400, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1344.649687277967" },
-            { createdTime: 770832000, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1336.776486876738" },
-            { createdTime: 770745600, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1269.337049428888" },
-            { createdTime: 770659200, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1252.943147200277" },
-            { createdTime: 770572800, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1233.048877496459" },
-            { createdTime: 770486400, JUSDT_jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or: "1221.753962288614" }
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          balances: [
+            {
+              date: "2024-06-20",
+              value: "1610.430558312638"
+            },
+            {
+              date: "2024-06-19",
+              value: "1606.169046642324"
+            },
+            {
+              date: "2024-06-18",
+              value: "1585.193063176591"
+            },
+            {
+              date: "2024-06-17",
+              value: "1542.454595797282"
+            },
+            {
+              date: "2024-06-16",
+              value: "1518.288063528697"
+            },
+            {
+              date: "2024-06-15",
+              value: "1517.506715823822"
+            },
+            {
+              date: "2024-06-14",
+              value: "1502.779280686739"
+            },
+            {
+              date: "2024-06-13",
+              value: "1479.24934468004"
+            },
+            {
+              date: "2024-06-12",
+              value: "1465.159485836139"
+            },
+            {
+              date: "2024-06-11",
+              value: "1449.204219592905"
+            },
+            {
+              date: "2024-06-10",
+              value: "1449.005851372628"
+            },
+            {
+              date: "2024-06-09",
+              value: "1436.512186442034"
+            },
+            {
+              date: "2024-06-08",
+              value: "1418.086563214109"
+            },
+            {
+              date: "2024-06-07",
+              value: "1351.332986472478"
+            },
+            {
+              date: "2024-06-06",
+              value: "1344.649687277967"
+            },
+            {
+              date: "2024-06-05",
+              value: "1336.776486876738"
+            },
+            {
+              date: "2024-06-04",
+              value: "1269.337049428888"
+            },
+            {
+              date: "2024-06-03",
+              value: "1252.943147200277"
+            },
+            {
+              date: "2024-06-02",
+              value: "1233.048877496459"
+            },
+            {
+              date: "2024-06-01",
+              value: "1221.753962288614"
+            }
           ]
         }
-      ],
-      msg: ""
-    });
-    const res = await explorer.fetchTokenBalanceStatistic({
-      uuid: "jGa9J9TkqtBc",
-      address: "jMO2eYX5z4j8b2FVU4k4zvQfZzgY",
-      token: "JUSDT"
-    });
-
-    expect(res).toEqual({
-      code: "0",
-      msg: "",
-      data: {
-        balances: [
-          {
-            date: "2024-06-20",
-            value: "1610.430558312638"
-          },
-          {
-            date: "2024-06-19",
-            value: "1606.169046642324"
-          },
-          {
-            date: "2024-06-18",
-            value: "1585.193063176591"
-          },
-          {
-            date: "2024-06-17",
-            value: "1542.454595797282"
-          },
-          {
-            date: "2024-06-16",
-            value: "1518.288063528697"
-          },
-          {
-            date: "2024-06-15",
-            value: "1517.506715823822"
-          },
-          {
-            date: "2024-06-14",
-            value: "1502.779280686739"
-          },
-          {
-            date: "2024-06-13",
-            value: "1479.24934468004"
-          },
-          {
-            date: "2024-06-12",
-            value: "1465.159485836139"
-          },
-          {
-            date: "2024-06-11",
-            value: "1449.204219592905"
-          },
-          {
-            date: "2024-06-10",
-            value: "1449.005851372628"
-          },
-          {
-            date: "2024-06-09",
-            value: "1436.512186442034"
-          },
-          {
-            date: "2024-06-08",
-            value: "1418.086563214109"
-          },
-          {
-            date: "2024-06-07",
-            value: "1351.332986472478"
-          },
-          {
-            date: "2024-06-06",
-            value: "1344.649687277967"
-          },
-          {
-            date: "2024-06-05",
-            value: "1336.776486876738"
-          },
-          {
-            date: "2024-06-04",
-            value: "1269.337049428888"
-          },
-          {
-            date: "2024-06-03",
-            value: "1252.943147200277"
-          },
-          {
-            date: "2024-06-02",
-            value: "1233.048877496459"
-          },
-          {
-            date: "2024-06-01",
-            value: "1221.753962288614"
-          }
-        ]
-      }
+      });
     });
   });
 });
