@@ -2527,7 +2527,7 @@ describe("test explorer", () => {
         msg: "error"
       });
       try {
-        await explorer.fetchTokensInFo({
+        await explorer.fetchTokensInfo({
           uuid: "jGa9J9TkqtBc"
         });
       } catch (error) {
@@ -2536,7 +2536,7 @@ describe("test explorer", () => {
         expect(error.message).toEqual("error");
       }
       await expect(
-        explorer.fetchTokensInFo({
+        explorer.fetchTokensInfo({
           uuid: "jGa9J9TkqtBc"
         })
       ).rejects.toThrow(new CloudError("-1", "error"));
@@ -2585,7 +2585,7 @@ describe("test explorer", () => {
           count: 266
         }
       });
-      const res = await explorer.fetchTokensInFo({
+      const res = await explorer.fetchTokensInfo({
         uuid: "jGa9J9TkqtBc",
         issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or"
       });

@@ -785,7 +785,7 @@ export default class JCCDexExplorer {
     return { code, msg, data: { transactions } };
   }
 
-  public async fetchTokensInFo(options: IFetchTokensOptions): Promise<IFetchTokensResponse> {
+  public async fetchTokensInfo(options: IFetchTokensOptions): Promise<IFetchTokensResponse> {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
     assert(isValidPage(page), "Page is invalid");
