@@ -296,7 +296,7 @@ export default class JCCDexExplorer {
       delete transaction.upperHash;
       transaction.time = convertTime(transaction.time);
     });
-    return { code, msg, data: { transactions, total: data.count as number } };
+    return { code, msg, data: { transactions, count: data.count as number } };
   }
 
   public async fetchLatestSixBlocks(options: IFetchLatestSixBlocksOptions): Promise<IFetchLatestSixBlocksResponse> {
@@ -386,7 +386,8 @@ export default class JCCDexExplorer {
             issueDate: nft.issueDate as number,
             totalCount: nft.totalCount as number
           };
-        })
+        }),
+        count: data.count as number // total count of nft
       }
     };
   }
@@ -630,7 +631,7 @@ export default class JCCDexExplorer {
     }
 
     const hashInfos = (data.list as IHashInfo[]) || [];
-    const total = data.count as number;
+    const count = data.count as number;
 
     hashInfos.forEach((info) => {
       info.hash = info._id;
@@ -640,7 +641,7 @@ export default class JCCDexExplorer {
       info.time = convertTime(info.time);
       info.past = info.past * 1000;
     });
-    return { code, msg, data: { hashInfos, total } };
+    return { code, msg, data: { hashInfos, count } };
   }
 
   public async fetchHashDetailInfo(
@@ -674,16 +675,17 @@ export default class JCCDexExplorer {
             block: info.block as number,
             time: convertTime(info.time as number),
             past: (info.past as number) * 1000,
-            transNum: info.transNum as number,
+            transNum: info.transNum as number, // transaction counts in block
             parentHash: info.upperHash as string,
             totalCoins: info.totalCoins as string
           },
           blockDetails: (data.list as IBlockHashDetailInfo[]).map((tInfo) => {
             tInfo.hash = tInfo._id;
             tInfo.success = tInfo.succ;
+            delete tInfo._id;
+            delete tInfo.hashType;
             return tInfo;
-          }),
-          total: data.count as number
+          })
         }
       };
     }
@@ -748,42 +750,6 @@ export default class JCCDexExplorer {
     return { code, msg, data: { transactions } };
   }
 
-  public async fetchTokensInfoByIssuer(
-    options: IFetchBlockHashTransactionsOptions
-  ): Promise<IFetchBlockHashTransactionsResponse> {
-    const page = options.page || 0;
-    const size = options.size || this.pageSize.TWENTY;
-    const hash = options.blockHash;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(isDef(hash) && hash !== "", "Hash is invalid");
-    const res: IResponse = await this.fetch({
-      method: "get",
-      baseURL: this.baseUrl,
-      url: "/sum/tokenlist/" + options.uuid,
-      params: {
-        h: hash,
-        p: page,
-        s: size,
-        n: 1 // this parameter seems to be bug, must be greater than 0
-      }
-    });
-    const { code, msg, data } = res;
-    if (!this.isSuccess(code)) {
-      throw new CloudError(code, msg);
-    }
-
-    const transactions = (data.list as IBlockHashDetailInfo[]) || [];
-    transactions.forEach((trans) => {
-      trans.hash = trans._id;
-      trans.success = trans.succ;
-      delete trans._id;
-      delete trans.succ;
-      delete trans.hashType;
-    });
-    return { code, msg, data: { transactions } };
-  }
-
   public async fetchTokensInfo(options: IFetchTokensOptions): Promise<IFetchTokensResponse> {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
@@ -812,7 +778,7 @@ export default class JCCDexExplorer {
       }
       delete t.count;
     });
-    return { code, msg, data: { tokens, total: data.count as number } };
+    return { code, msg, data: { tokens, count: data.count as number } };
   }
 
   public async fetchTokensCirculationInfo(
