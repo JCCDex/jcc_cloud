@@ -229,7 +229,7 @@ export interface IBlockTransaction {
 export interface IFetchBlockTransactionsResponse extends IResponse {
   data: {
     transactions: IBlockTransaction[];
-    total: number;
+    count: number;
   };
 }
 
@@ -302,6 +302,7 @@ export interface IIssuedNft {
 export interface IFetchIssuerNftsResponse extends IResponse {
   data: {
     nfts: IIssuedNft[];
+    count: number;
   };
 }
 
@@ -467,7 +468,7 @@ export interface IFetchAllHashOptions extends IUUID, IBaseRequest {
 export interface IFetchAllHashResponse extends IResponse {
   data: {
     hashInfos: IHashInfo[];
-    total: number;
+    count: number;
   };
 }
 
@@ -508,12 +509,11 @@ export interface IFetchBlockHashDetailResponse extends IResponse {
       block: number;
       time: number;
       past: number;
-      transNum: number;
+      transNum: number; // the number of transactions in this block
       parentHash: string;
       totalCoins: string;
     };
     blockDetails: IBlockHashDetailInfo[];
-    total: number; // the number of transactions in this block
   };
 }
 
@@ -522,7 +522,7 @@ export interface IHashDetailInfo extends IBlockHashDetailInfo {
   block: number; // block number,
   time: number; // transaction time (ms),
   past?: number; // the time from now to transaction time (ms),
-  flag?: number; // match trade flags,
+  matchFlag?: number; // match trade flags,
   matchGets?: IToken; // currency and quantity to be paid for the match trade; when flag = 1,
   matchPays?: IToken; // currency and quantity to be received for the match trade; when flag = 1,
 }
@@ -570,7 +570,7 @@ export interface ITokenInfo {
 export interface IFetchTokensResponse extends IResponse {
   data: {
     tokens: ITokenInfo[];
-    total: number;
+    count: number;
   };
 }
 

@@ -824,7 +824,7 @@ describe("test explorer", () => {
               blockHash: "3ED3930160AD1FE7727B36CC8182E3647D9DCA3855157913B40F31E3EFE75BE3"
             }
           ],
-          total: 3
+          count: 3
         }
       });
     });
@@ -1674,7 +1674,8 @@ describe("test explorer", () => {
               issueDate: 719031430,
               totalCount: 1000
             }
-          ]
+          ],
+          count: 1
         }
       });
 
@@ -1710,7 +1711,8 @@ describe("test explorer", () => {
               issueDate: 719031430,
               totalCount: 1000
             }
-          ]
+          ],
+          count: 1
         }
       });
     });
@@ -2061,7 +2063,7 @@ describe("test explorer", () => {
               flag: 2
             }
           ],
-          total: 1000000
+          count: 1000000
         }
       });
     });
@@ -2305,8 +2307,6 @@ describe("test explorer", () => {
           },
           blockDetails: [
             {
-              _id: "3816D1F4F6EAAF145ABCC598E454068EA7A2125B6CDBACA213D582607A5D2013",
-              hashType: 2,
               index: 0,
               type: "Payment",
               account: "jBEXYiEwFD7hEY1DtcWFjDVGqXCtPjzj2p",
@@ -2323,8 +2323,6 @@ describe("test explorer", () => {
               success: "tesSUCCESS"
             },
             {
-              _id: "7148B37BA0EF0CFB9A3EBE0290979A44E542F01BEAF816D683AC82408CE026FC",
-              hashType: 2,
               index: 1,
               type: "OfferCreate",
               account: "ja2rF7o54ydxJgwa1Vnf5wmxf2c3UmnB6A",
@@ -2348,8 +2346,7 @@ describe("test explorer", () => {
               hash: "7148B37BA0EF0CFB9A3EBE0290979A44E542F01BEAF816D683AC82408CE026FC",
               success: "tesSUCCESS"
             }
-          ],
-          total: 2
+          ]
         }
       });
     });
@@ -2640,7 +2637,7 @@ describe("test explorer", () => {
               holdnum: 144
             }
           ],
-          total: 266
+          count: 266
         }
       });
     });
