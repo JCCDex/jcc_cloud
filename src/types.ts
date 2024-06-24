@@ -73,12 +73,11 @@ export interface IFetchOffersResponse extends IResponse {
 }
 
 export enum OrderType {
-  ALL = "",
-  OFFERCREATE = "OfferCreate",
-  OFFERAFFECT = "OfferAffect",
-  OFFERCANCEL = "OfferCancel",
-  SEND = "Send",
-  RECEIVE = "Receive"
+  OfferCreate = "OfferCreate",
+  OfferAffect = "OfferAffect",
+  OfferCancel = "OfferCancel",
+  Send = "Send",
+  Receive = "Receive"
 }
 
 export interface IFetchHistoryOrdersOptions extends IUUID, IBaseRequest {
@@ -87,7 +86,7 @@ export interface IFetchHistoryOrdersOptions extends IUUID, IBaseRequest {
   size?: PageSize; // page size, default 20
   beginTime?: string; // the start time for query orders; format: "2021-1-1"
   endTime?: string; // the end time for query order; format: "2021-3-31"
-  type?: OrderType; // order type {"OfferCreate", "OfferAffect", "OfferCancel", "Send", "Receive"}
+  type?: OrderType | string; // order type {"OfferCreate", "OfferAffect", "OfferCancel", "Send", "Receive"}
   buyOrSell?: TradeType; // trade type;  1: buy, 2: sell, default 0: all
   /**
    * 1. coinPair can be empty, not as query condition
@@ -306,31 +305,52 @@ export interface IFetchIssuerNftsResponse extends IResponse {
   };
 }
 
-export interface IFetchNftsByIdOrNameOptions extends IUUID, IBaseRequest {
-  tokenId?: string;
+export interface IFetchNftsNameOptions extends IUUID, IBaseRequest {
   tokenName?: string;
 }
 
-export interface IFetchNftsByIdOrNameResponse extends IResponse {
+export interface IFetchNftsNameResponse extends IResponse {
   data: {
-    tokenIds: string[];
     tokenNames: {
       name: string;
-      holder: string;
+      issuer: string; // nft issuer
     }[];
   };
+}
+
+export interface IFetchAllNftsNameResponse extends IResponse {
+  data: {
+    tokenNames: {
+      firstLetter: string;
+      list: {
+        name: string;
+        issuer: string; // nft issuer
+      }[];
+    }[];
+  };
+}
+
+export interface IFetchNftTokenIdOptions extends IUUID, IBaseRequest {
+  tokenId?: string;
+}
+
+export interface IFetchNftTokenIdResponse extends IResponse {
+  data: {
+    tokenIds: string[];
+  }
 }
 
 export enum NftTransactionType {
   TokenIssue = "TokenIssue",
   TransferToken = "TransferToken",
+  TransferTokenP = "TransferTokenP", // TransferTokenP means passively received transfers
   TokenDel = "TokenDel"
 }
 
 export interface IFetchNftTransfersOptions extends IUUID, IBaseRequest {
   address?: string;
   tokenId?: string;
-  type?: NftTransactionType;
+  type?: NftTransactionType | string;
   page?: number;
   size?: PageSize;
   beginTime?: string;
@@ -448,10 +468,9 @@ export interface IFetchLatestSixHashResponse extends IResponse {
 }
 
 export enum TransactionType {
-  ALL = "",
-  OFFERCREATE = "OfferCreate",
-  OFFERCANCEL = "OfferCancel",
-  PAYMENT = "Payment"
+  OfferCreate = "OfferCreate",
+  OfferCancel = "OfferCancel",
+  Payment = "Payment"
 }
 
 export interface IFetchAllHashOptions extends IUUID, IBaseRequest {
@@ -459,7 +478,7 @@ export interface IFetchAllHashOptions extends IUUID, IBaseRequest {
   size?: PageSize; // page size, default 20
   beginTime?: string; // the start time for query hash; format: "2021-1-1"
   endTime?: string; // the end time for query hash; format: "2021-3-31"
-  type?: TransactionType; // transaction type {"OfferCreate", "OfferCancel", "payment"}
+  type?: TransactionType | string; // transaction type {"OfferCreate", "OfferCancel", "payment"}
   buyOrSell?: TradeType; // trade type;  1: buy, 2: sell, default 0: all
   coinPair?: string; // example: "JETH-JUSDT",  "JETH-",  "-JUSDT", "JETH"
   matchFlag?: number; // match flag; this parameter seems to be invalid in testing

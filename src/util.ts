@@ -17,21 +17,27 @@ export const isValidStatus = (v) => {
 };
 
 export const isValidNftTransactionType = (v) => {
-  return (
-    !isDef(v) ||
-    NftTransactionType.TokenDel === v ||
-    NftTransactionType.TokenIssue === v ||
-    NftTransactionType.TransferToken === v
-  );
+  let valid = !isDef(v);
+  if (!valid && typeof v === "string" && v !== "") {
+    const types = v.split(",") as NftTransactionType[];
+    const invalidType = (types).find((type) => {
+      return !(type in NftTransactionType);
+    });
+    valid = !invalidType;
+  }
+  return valid;
 };
 
 export const isValidTransactionType = (v) => {
-  return (
-    TransactionType.ALL === v ||
-    TransactionType.OFFERCANCEL === v ||
-    TransactionType.OFFERCREATE === v ||
-    TransactionType.PAYMENT === v
-  );
+  let valid = v === "" || !isDef(v);
+  if (!valid && typeof v === "string" && v !== "") {
+    const types = v.split(",") as TransactionType[];
+    const invalidType = (types).find((type) => {
+      return !(type in TransactionType);
+    });
+    valid = !invalidType;
+  }
+  return valid;
 };
 
 export const isValidTradeType = (v) => {
@@ -39,14 +45,15 @@ export const isValidTradeType = (v) => {
 };
 
 export const isValidOrderType = (v) => {
-  return (
-    OrderType.ALL === v ||
-    OrderType.OFFERCANCEL === v ||
-    OrderType.OFFERCREATE === v ||
-    OrderType.OFFERAFFECT === v ||
-    OrderType.RECEIVE === v ||
-    OrderType.SEND === v
-  );
+  let valid = v === "" || !isDef(v);
+  if (!valid && typeof v === "string") {
+    const types = v.split(",") as OrderType[];
+    const invalidType = (types).find((type) => {
+      return !(type in OrderType);
+    });
+    valid = !invalidType;
+  }
+  return valid;
 };
 
 export const convertTime = (time: number): number => {

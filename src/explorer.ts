@@ -29,8 +29,11 @@ import {
   IBlockInfo,
   IFetchIssuerNftsOptions,
   IFetchIssuerNftsResponse,
-  IFetchNftsByIdOrNameOptions,
-  IFetchNftsByIdOrNameResponse,
+  IFetchNftsNameOptions,
+  IFetchNftsNameResponse,
+  IFetchAllNftsNameResponse,
+  IFetchNftTokenIdOptions,
+  IFetchNftTokenIdResponse,
   IFetchNftTransfersOptions,
   IFetchNftTransfersResponse,
   IFetchNftConfigsRequest,
@@ -175,7 +178,7 @@ export default class JCCDexExplorer {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
     const buyOrSell = options.buyOrSell || this.tradeType.ALL;
-    const type = options.type || this.orderType.ALL;
+    const type = options.type || "";
     assert(isValidPage(page), "Page is invalid");
     assert(isValidSize(size), "Size is invalid");
     assert(isValidTradeType(buyOrSell), "buyOrSell is invalid");
@@ -392,14 +395,54 @@ export default class JCCDexExplorer {
     };
   }
 
-  public async fetchNftsByIdOrName(options: IFetchNftsByIdOrNameOptions): Promise<IFetchNftsByIdOrNameResponse> {
+  public async fetchNftsName(
+    options: IFetchNftsNameOptions
+  ): Promise<IFetchNftsNameResponse | IFetchAllNftsNameResponse> {
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/explorer/v1/nft/all/" + options.uuid,
       params: {
-        k: options.tokenId,
-        n: options.tokenName
+        n: options.tokenName || ""
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    let tokenNames = [];
+    if (options.tokenName) {
+      tokenNames = (data.token_name as string[]).map((t) => {
+        const [name, issuer] = t.split("_");
+        return { name, issuer };
+      })
+    } else {
+      tokenNames = Object.values(data.token_name).map((t) => {
+        let firstLetter = "";
+        let list = [];
+        for (const key in t) {
+          firstLetter = key;
+          list = (t[key] as Array<string>).map((nft) => {
+            const [name, issuer] = nft.split("_");
+            return { name, issuer };
+          });
+        }
+        return { firstLetter, list }
+      });
+    }
+
+    return { code, msg, data: { tokenNames } };
+  }
+
+  public async fetchNftTokenId(
+    options: IFetchNftTokenIdOptions,
+  ): Promise<IFetchNftTokenIdResponse> {
+    const res: IResponse = await this.fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/explorer/v1/nft/all/" + options.uuid,
+      params: {
+        k: options.tokenId || "",
       }
     });
     const { code, msg, data } = res;
@@ -410,11 +453,7 @@ export default class JCCDexExplorer {
       code,
       msg,
       data: {
-        tokenIds: data.token_id as string[],
-        tokenNames: (data.token_name as string[]).map((t) => {
-          const [name, holder] = t.split("_");
-          return { name, holder };
-        })
+        tokenIds: data.token_id as string[]
       }
     };
   }
@@ -437,7 +476,7 @@ export default class JCCDexExplorer {
         k: tokenId,
         p: page,
         s: size,
-        t: type,
+        t: type || "",
         b: options.beginTime,
         e: options.endTime,
         aw: options.counterparty
@@ -604,7 +643,7 @@ export default class JCCDexExplorer {
   public async fetchAllHash(options: IFetchAllHashOptions): Promise<IFetchAllHashResponse> {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
-    const type = options.type || this.transactionType.ALL;
+    const type = options.type || "";
     const tradeType = options.buyOrSell || this.tradeType.ALL;
     assert(isValidPage(page), "Page is invalid");
     assert(isValidSize(size), "Size is invalid");
