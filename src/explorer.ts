@@ -80,7 +80,8 @@ import {
   isValidTransactionType,
   isValidTradeType,
   isValidOrderType,
-  convertTime
+  convertTime,
+  isValidString
 } from "./util";
 const assert = require("assert");
 
@@ -112,7 +113,7 @@ export default class JCCDexExplorer {
 
   public async fetchBalances(options: IFetchBalancesOptions): Promise<IFetchBalancesResponse> {
     const address = options.address;
-    assert(isDef(address) && address !== "", "Address is invalid");
+    assert(isValidString(address), "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
@@ -148,7 +149,7 @@ export default class JCCDexExplorer {
     assert(isValidPage(page), "Page is invalid");
     assert(isValidSize(size), "Size is invalid");
     assert(isValidTradeType(buyOrSell), "buyOrSell is invalid");
-    assert(isDef(address) && address !== "", "Address is invalid");
+    assert(isValidString(address), "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
@@ -235,7 +236,7 @@ export default class JCCDexExplorer {
     const address = options.address;
     assert(isValidPage(page), "Page is invalid");
     assert(isValidSize(size), "Size is invalid");
-    assert(isDef(address) && address !== "", "Address is invalid");
+    assert(isValidString(address), "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
@@ -415,7 +416,7 @@ export default class JCCDexExplorer {
       tokenNames = (data.token_name as string[]).map((t) => {
         const [name, issuer] = t.split("_");
         return { name, issuer };
-      })
+      });
     } else {
       tokenNames = Object.values(data.token_name).map((t) => {
         let firstLetter = "";
@@ -427,22 +428,20 @@ export default class JCCDexExplorer {
             return { name, issuer };
           });
         }
-        return { firstLetter, list }
+        return { firstLetter, list };
       });
     }
 
     return { code, msg, data: { tokenNames } };
   }
 
-  public async fetchNftTokenId(
-    options: IFetchNftTokenIdOptions,
-  ): Promise<IFetchNftTokenIdResponse> {
+  public async fetchNftTokenId(options: IFetchNftTokenIdOptions): Promise<IFetchNftTokenIdResponse> {
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       url: "/explorer/v1/nft/all/" + options.uuid,
       params: {
-        k: options.tokenId || "",
+        k: options.tokenId || ""
       }
     });
     const { code, msg, data } = res;
@@ -687,7 +686,7 @@ export default class JCCDexExplorer {
     options: IFetchHashDetailOptions
   ): Promise<IFetchBlockHashDetailResponse | IFetchTransHashDetailResponse> {
     const hash = options.hash;
-    assert(isDef(hash) && hash !== "", "Hash is invalid");
+    assert(isValidString(hash), "Hash is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
@@ -761,7 +760,7 @@ export default class JCCDexExplorer {
     const hash = options.blockHash;
     assert(isValidPage(page), "Page is invalid");
     assert(isValidSize(size), "Size is invalid");
-    assert(isDef(hash) && hash !== "", "Hash is invalid");
+    assert(isValidString(hash), "Hash is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
@@ -828,7 +827,7 @@ export default class JCCDexExplorer {
     const { token, issuer } = options;
     assert(isValidPage(page), "Page is invalid");
     assert(isValidSize(size), "Size is invalid");
-    assert(isDef(token) && token !== "", "Token is invalid");
+    assert(isValidString(token), "Token is invalid");
     if (!issuer) {
       assert(token.toUpperCase().startsWith("SWT"), "Issuer is invalid");
     }
@@ -985,8 +984,8 @@ export default class JCCDexExplorer {
     const { address, token, beginTime, endTime } = options;
     assert(isValidPage(page), "Page is invalid");
     assert(isValidSize(size), "Size is invalid");
-    assert(isDef(address) && address !== "", "Address is invalid");
-    assert(isDef(token) && token !== "", "Token is invalid");
+    assert(isValidString(address), "Address is invalid");
+    assert(isValidString(token), "Token is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
