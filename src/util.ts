@@ -16,22 +16,25 @@ export const isValidStatus = (v) => {
   return !isDef(v) || NFTStatus.Invalid === v || NFTStatus.Valid === v;
 };
 
+export const isEmptyString = (v) => {
+  return typeof v === "string" && v === "";
+};
+
+export const isValidString = (v) => {
+  return typeof v === "string" && v !== "";
+};
+
+export const valuesInEnum = (values, e): boolean => {
+  const enums = Object.values(e);
+  return values.every((v) => enums.includes(v));
+};
+
 export const isValidNftTransactionType = (v) => {
-  return (
-    !isDef(v) ||
-    NftTransactionType.TokenDel === v ||
-    NftTransactionType.TokenIssue === v ||
-    NftTransactionType.TransferToken === v
-  );
+  return !isDef(v) || (isValidString(v) && valuesInEnum(v.split(","), NftTransactionType));
 };
 
 export const isValidTransactionType = (v) => {
-  return (
-    TransactionType.ALL === v ||
-    TransactionType.OFFERCANCEL === v ||
-    TransactionType.OFFERCREATE === v ||
-    TransactionType.PAYMENT === v
-  );
+  return !isDef(v) || isEmptyString(v) || (isValidString(v) && valuesInEnum(v.split(","), TransactionType));
 };
 
 export const isValidTradeType = (v) => {
@@ -39,14 +42,7 @@ export const isValidTradeType = (v) => {
 };
 
 export const isValidOrderType = (v) => {
-  return (
-    OrderType.ALL === v ||
-    OrderType.OFFERCANCEL === v ||
-    OrderType.OFFERCREATE === v ||
-    OrderType.OFFERAFFECT === v ||
-    OrderType.RECEIVE === v ||
-    OrderType.SEND === v
-  );
+  return !isDef(v) || isEmptyString(v) || (isValidString(v) && valuesInEnum(v.split(","), OrderType));
 };
 
 export const convertTime = (time: number): number => {

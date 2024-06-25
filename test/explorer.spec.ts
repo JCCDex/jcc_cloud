@@ -268,7 +268,7 @@ describe("test explorer", () => {
         uuid: "jGa9J9TkqtBc",
         address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
         size: explorer.pageSize.FIFTY,
-        type: explorer.orderType.OFFERCREATE,
+        type: "OfferCreate,OfferCancel,Send",
         buyOrSell: explorer.tradeType.BUY
       });
 
@@ -283,7 +283,7 @@ describe("test explorer", () => {
             s: 50,
             b: "",
             e: "",
-            t: "OfferCreate",
+            t: "OfferCreate,OfferCancel,Send",
             c: "",
             bs: 1
           }
@@ -296,7 +296,7 @@ describe("test explorer", () => {
         data: {
           historOrders: [
             {
-              type: explorer.orderType.OFFERCREATE,
+              type: "OfferCreate",
               time: convertTime(100),
               hash: "A5FAED341A6292447F130056A68ACB2155AE0C37287D04CF12DD17CCE1C0AA2B",
               block: 28818929,
@@ -1378,6 +1378,16 @@ describe("test explorer", () => {
           type: "" as NftTransactionType
         })
       ).rejects.toThrow(new Error('The value of "type" is invalid'));
+      
+      await expect(
+        explorer.fetchNftTransfers({
+          uuid: "jGa9J9TkqtBc",
+          page: 1,
+          size: 100,
+          tokenId: "123",
+          type: "TransferToken,111,TokenDel" as NftTransactionType
+        })
+      ).rejects.toThrow(new Error('The value of "type" is invalid'));
     });
 
     test("should throw error when response is not success", async () => {
@@ -1434,7 +1444,8 @@ describe("test explorer", () => {
 
       const res = await explorer.fetchNftTransfers({
         uuid: "jGa9J9TkqtBc",
-        address: "jaNBAS8PPENf178WwVynmunWo8dQGBjrh9"
+        address: "jaNBAS8PPENf178WwVynmunWo8dQGBjrh9",
+        type: "TransferToken,TokenDel"
       });
 
       expect(
@@ -1447,7 +1458,7 @@ describe("test explorer", () => {
             k: undefined,
             p: 0,
             s: 20,
-            t: undefined,
+            t: "TransferToken,TokenDel",
             b: undefined,
             e: undefined,
             aw: undefined
@@ -1585,7 +1596,7 @@ describe("test explorer", () => {
     });
   });
 
-  describe("test fetchNftsByIdOrName", () => {
+  describe("test fetchNftsName", () => {
     afterEach(() => {
       sandbox.reset();
     });
@@ -1595,25 +1606,42 @@ describe("test explorer", () => {
         code: "-1",
         msg: "error"
       });
-      await expect(explorer.fetchNftsByIdOrName({ uuid: "jGa9J9TkqtBc" })).rejects.toThrow(
+      await expect(explorer.fetchNftsName({ uuid: "jGa9J9TkqtBc" })).rejects.toThrow(
         new CloudError("-1", "error")
       );
     });
 
-    test("should return nft token info", async () => {
+    test("should return All Nfts list", async () => {
       stub.resolves({
         code: "0",
         msg: "",
         data: {
-          token_name: ["Golden Sands 金沙_jaNBAS8PPENf178WwVynmunWo8dQGBjrh9"],
-          token_id: ["64656E2053616E647320E98791E6B29900000000000000000000000000000066"]
+          "token_name": [
+            {
+              "N": [ "NFT Test_jaNBAS8PPENf178WwVynmunWo8dQGBjrh9" ]
+            },
+            {
+              "G": [ "Golden Sands 金沙_jaNBAS8PPENf178WwVynmunWo8dQGBjrh9" ]
+            },
+            {
+              "T": [
+                "TEST_jEnfwCyB1cvXH9T9WswtoqmKKcRZuyELvQ",
+                "TEST2_jEnfwCyB1cvXH9T9WswtoqmKKcRZuyELvQ"
+              ]
+            },
+            {
+              "num": []
+            },
+            {
+              "...": []
+            }
+          ],
+          "token_id": []
         }
       });
 
-      const res = await explorer.fetchNftsByIdOrName({
-        uuid: "jGa9J9TkqtBc",
-        tokenId: "1",
-        tokenName: "2"
+      const res = await explorer.fetchNftsName({
+        uuid: "jGa9J9TkqtBc"
       });
 
       expect(
@@ -1621,10 +1649,7 @@ describe("test explorer", () => {
           method: "get",
           baseURL: "https://swtcscan.jccdex.cn",
           url: "/explorer/v1/nft/all/jGa9J9TkqtBc",
-          params: {
-            k: "1",
-            n: "2"
-          }
+          params: { n: "" }
         })
       ).toEqual(true);
 
@@ -1632,12 +1657,137 @@ describe("test explorer", () => {
         code: "0",
         msg: "",
         data: {
-          tokenIds: ["64656E2053616E647320E98791E6B29900000000000000000000000000000066"],
           tokenNames: [
             {
-              name: "Golden Sands 金沙",
-              holder: "jaNBAS8PPENf178WwVynmunWo8dQGBjrh9"
-            }
+              firstLetter: 'N',
+              list: [
+                {
+                  name: 'NFT Test',
+                  issuer: 'jaNBAS8PPENf178WwVynmunWo8dQGBjrh9'
+                }
+              ]
+            },
+            {
+              firstLetter: 'G',
+              list: [
+                {
+                  name: 'Golden Sands 金沙',
+                  issuer: 'jaNBAS8PPENf178WwVynmunWo8dQGBjrh9'
+                }
+              ]
+            },
+            {
+              firstLetter: 'T',
+              list: [
+                {
+                  name: 'TEST',
+                  issuer: 'jEnfwCyB1cvXH9T9WswtoqmKKcRZuyELvQ'
+                },
+                {
+                  name: 'TEST2',
+                  issuer: 'jEnfwCyB1cvXH9T9WswtoqmKKcRZuyELvQ'
+                }
+              ]
+            },
+            { firstLetter: 'num', list: [] },
+            { firstLetter: '...', list: [] }
+          ]
+        }
+      });
+    });
+
+    test("should return Nfts list by keywords", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        data: {
+         "token_name": [
+            "NFT Test_jaNBAS8PPENf178WwVynmunWo8dQGBjrh9",
+            "TEST_jEnfwCyB1cvXH9T9WswtoqmKKcRZuyELvQ",
+            "TEST2_jEnfwCyB1cvXH9T9WswtoqmKKcRZuyELvQ"
+        ],
+        "token_id": []
+        }
+      });
+
+      const res = await explorer.fetchNftsName({
+        uuid: "jGa9J9TkqtBc",
+        tokenName: "test"
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/explorer/v1/nft/all/jGa9J9TkqtBc",
+          params: { n: "test" }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          tokenNames: [
+            {
+              name: 'NFT Test',
+              issuer: 'jaNBAS8PPENf178WwVynmunWo8dQGBjrh9'
+            },
+            { name: 'TEST', issuer: 'jEnfwCyB1cvXH9T9WswtoqmKKcRZuyELvQ' },
+            { name: 'TEST2', issuer: 'jEnfwCyB1cvXH9T9WswtoqmKKcRZuyELvQ' }
+          ]
+        }
+      });
+    });
+  });
+
+  describe("test fetchNftTokenId", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      await expect(explorer.fetchNftTokenId({ uuid: "jGa9J9TkqtBc" })).rejects.toThrow(
+        new CloudError("-1", "error")
+      );
+    });
+
+    test("should return tokenId list", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        data: {
+          "token_name": [],
+          "token_id": [
+              "36323842413031432D393537372D343832322D424346372D3135313946364241"
+          ]
+        }
+      });
+
+      const res = await explorer.fetchNftTokenId({
+        uuid: "jGa9J9TkqtBc",
+        tokenId: "36323842413031432D393537372D343832322D424346372D3135313946364241"
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/explorer/v1/nft/all/jGa9J9TkqtBc",
+          params: { k: "36323842413031432D393537372D343832322D424346372D3135313946364241" }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          tokenIds: [
+            '36323842413031432D393537372D343832322D424346372D3135313946364241'
           ]
         }
       });
@@ -1977,7 +2127,10 @@ describe("test explorer", () => {
           count: 1000000
         }
       });
-      const res = await explorer.fetchAllHash({ uuid: "jGa9J9TkqtBc" });
+      const res = await explorer.fetchAllHash({ 
+        uuid: "jGa9J9TkqtBc",
+        type: explorer.transactionType.OfferCreate + "," + explorer.transactionType.Payment
+      });
 
       expect(
         stub.calledOnceWithExactly({
@@ -1989,7 +2142,7 @@ describe("test explorer", () => {
             s: 20,
             b: "",
             e: "",
-            t: explorer.transactionType.ALL,
+            t: "OfferCreate,Payment",
             bs: explorer.tradeType.ALL,
             c: "",
             f: ""
