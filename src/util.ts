@@ -16,28 +16,25 @@ export const isValidStatus = (v) => {
   return !isDef(v) || NFTStatus.Invalid === v || NFTStatus.Valid === v;
 };
 
+export const isEmptyString = (v) => {
+  return typeof v === "string" && v === "";
+};
+
+export const isValidString = (v) => {
+  return typeof v === "string" && v !== "";
+};
+
+export const valuesInEnum = (values, e): boolean => {
+  const enums = Object.values(e);
+  return values.every((v) => enums.includes(v));
+};
+
 export const isValidNftTransactionType = (v) => {
-  let valid = !isDef(v);
-  if (!valid && typeof v === "string" && v !== "") {
-    const types = v.split(",") as NftTransactionType[];
-    const invalidType = (types).find((type) => {
-      return !(type in NftTransactionType);
-    });
-    valid = !invalidType;
-  }
-  return valid;
+  return !isDef(v) || (isValidString(v) && valuesInEnum(v.split(","), NftTransactionType));
 };
 
 export const isValidTransactionType = (v) => {
-  let valid = v === "" || !isDef(v);
-  if (!valid && typeof v === "string" && v !== "") {
-    const types = v.split(",") as TransactionType[];
-    const invalidType = (types).find((type) => {
-      return !(type in TransactionType);
-    });
-    valid = !invalidType;
-  }
-  return valid;
+  return !isDef(v) || isEmptyString(v) || (isValidString(v) && valuesInEnum(v.split(","), TransactionType));
 };
 
 export const isValidTradeType = (v) => {
@@ -45,15 +42,7 @@ export const isValidTradeType = (v) => {
 };
 
 export const isValidOrderType = (v) => {
-  let valid = v === "" || !isDef(v);
-  if (!valid && typeof v === "string") {
-    const types = v.split(",") as OrderType[];
-    const invalidType = (types).find((type) => {
-      return !(type in OrderType);
-    });
-    valid = !invalidType;
-  }
-  return valid;
+  return !isDef(v) || isEmptyString(v) || (isValidString(v) && valuesInEnum(v.split(","), OrderType));
 };
 
 export const convertTime = (time: number): number => {
