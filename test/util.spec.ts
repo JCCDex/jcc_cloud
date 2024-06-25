@@ -10,9 +10,6 @@ describe("test isValidTransactionType", () => {
       expect(isValidNftTransactionType("TokenIssue,TransferToken")).toBe(true);
       expect(isValidNftTransactionType(undefined)).toBe(true);
       expect(isValidNftTransactionType(null)).toBe(true);
-
-      const v = isValidNftTransactionType("");
-      console.log(v);
     });
 
     it("return false if nft transaction type is invalid", () => {
