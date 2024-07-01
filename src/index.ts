@@ -5,3 +5,5 @@ import { PageSize, TradeType, OrderType, TransactionType, NFTStatus, NftTransact
 import { CloudError } from "./error";
 
 export { JCCDexExplorer, PageSize, TradeType, OrderType, TransactionType, NFTStatus, NftTransactionType, CloudError };
+
+export * from "./fetch";
