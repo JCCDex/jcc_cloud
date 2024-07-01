@@ -1,5 +1,5 @@
 import { CloudError } from "./error";
-import fetch from "./fetch";
+import { defaultFetch } from "./fetch";
 import {
   IResponse,
   OrderType,
@@ -100,7 +100,7 @@ export default class JCCDexExplorer {
 
   constructor(baseUrl: string, customFetch?: unknown) {
     this.baseUrl = baseUrl;
-    this.fetch = customFetch || fetch;
+    this.fetch = customFetch || defaultFetch;
   }
 
   public setBaseUrl(baseUrl: string) {
