@@ -54,3 +54,11 @@ export const convertTimeToDate = (time: number): string => {
   const [month, day, year] = date.split("/");
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 };
+
+export const isValidFromChain = (v: number) => {
+  return v === 0 || v === 1;
+};
+
+export const isValidCount = (v: number) => {
+  return Number.isInteger(v) && v > 0;
+};

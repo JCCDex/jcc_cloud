@@ -50,6 +50,8 @@
   },
   "packageManager": "yarn@3.6.3",
   "dependencies": {
+    "@jccdex/jingtum-lib": "^1.0.2",
+    "@swtc/common": "^1.1.1",
     "axios": "^1.7.2"
   }
 }
