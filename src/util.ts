@@ -1,4 +1,6 @@
 import { NFTStatus, NftTransactionType, PageSize, TransactionType, TradeType, OrderType } from "./types";
+import { Wallet, ICreateExchange, ICancelExchange, IPayExchange } from "@jccdex/jingtum-lib";
+import { QueryState, QueryType } from "./txpoolTypes";
 
 export const isDef = (v) => {
   return v !== undefined && v !== null;
@@ -61,4 +63,46 @@ export const isValidFromChain = (v: number) => {
 
 export const isValidCount = (v: number) => {
   return Number.isInteger(v) && v > 0;
+};
+
+export const isValideSeqs = (v: number[]) => {
+  return Array.isArray(v) && v.length > 0 && v.every((i) => Number.isInteger(i));
+}
+
+export const isValidTxList = (v: (ICreateExchange | ICancelExchange | IPayExchange)[]) => {
+  const wallet = new Wallet("jingtum");
+  return Array.isArray(v) && v.length > 0 && v.every((tx) => {
+    const type = tx.TransactionType as string;
+    if (!isValidString(type) || !(type in TransactionType)) {
+      return false;
+    }
+    switch (type) {
+      case TransactionType.OfferCreate:
+        return  'Account' in tx && wallet.isValidAddress(tx.Account) &&
+                'Fee' in tx && typeof tx.Fee === 'number' &&
+                'Flags' in tx && (tx.Flags === 0x00080000 || tx.Flags === 0) &&
+                'Platform' in tx && typeof tx.Platform === 'string' &&
+                'TakerGets' in tx && typeof tx.TakerGets === 'object' &&
+                'TakerPays' in tx && typeof tx.TakerPays === 'object'
+      case TransactionType.OfferCancel:
+        return  'Account' in tx && wallet.isValidAddress(tx.Account) &&
+                'Fee' in tx && typeof tx.Fee === 'number' &&
+                'Flags' in tx && tx.Flags === 0 &&
+                'OfferSequence' in tx && Number.isInteger(tx.OfferSequence)
+      case TransactionType.Payment:
+        return  'Account' in tx && wallet.isValidAddress(tx.Account) &&
+                'Amount' in tx && (typeof tx.Amount === 'object' || typeof tx.Amount === 'string') &&
+                'Destination' in tx && wallet.isValidAddress(tx.Destination) &&
+                'Fee' in tx && typeof tx.Fee === 'number' &&
+                'Flags' in tx && tx.Flags === 0 &&
+                'Memos' in tx;
+    }
+  });
+};
+
+export const isValidQueryState = (v: number) => {
+  return v in QueryState;
+};
+export const isValidQueryType = (v: string) => {
+  return typeof v === 'string' && (v === QueryType.ALL || v === QueryType.ONE);
 };

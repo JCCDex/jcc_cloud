@@ -1544,6 +1544,7 @@ __metadata:
     prettier: ^3.3.0
     pretty-quick: ^4.0.0
     sinon: ^18.0.0
+    sm3.js: ^1.0.1
     typescript: ^5.4.5
     typescript-eslint: ^7.12.0
   languageName: unknown
@@ -5492,6 +5493,16 @@ __metadata:
   version: 3.0.0
   resolution: "slash@npm:3.0.0"
   checksum: 94a93fff615f25a999ad4b83c9d5e257a7280c90a32a7cb8b4a87996e4babf322e469c42b7f649fd5796edd8687652f3fb452a86dc97a816f01113183393f11c
+  languageName: node
+  linkType: hard
+
+"sm3.js@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "sm3.js@npm:1.0.1"
+  dependencies:
+    inherits: ^2.0.3
+    minimalistic-assert: ^1.0.1
+  checksum: 510cc527a411a1f6077c9280a5c7b4f119bc6063495b282abdfd8541e4f31b2e652e580671e29e6129012ed2ca6b0c8000eba9997dfca95cb9b2fd92822c42c4
   languageName: node
   linkType: hard
 

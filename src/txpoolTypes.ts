@@ -1,3 +1,4 @@
+import { ICreateExchange, ICancelExchange, IPayExchange } from "@jccdex/jingtum-lib"
 export interface IBaseRequest {}
 
 export interface IUUID {
@@ -36,6 +37,71 @@ export interface IFetchSeqsOptions extends IUUID, IBaseRequest {
 
 export interface IFetchSeqsResponse extends IResponse{
   data: {
-    seqs: string[];
+    seqs: number[];
   };
+}
+
+export interface IBatchSignData {
+  secret: string;
+  txList: (ICreateExchange | ICancelExchange | IPayExchange)[];
+  seqs: number[]; // need get from txpool service
+}
+
+export interface ITxPoolData {
+  dataHashSign: string;
+  dataJsonStr: string;
+}
+
+export interface ISubmitOptions extends IUUID, IBaseRequest {
+  publicKey: string;
+  submitPara: ITxPoolData;
+}
+
+export interface ISubmitResponse extends IResponse {
+  data: {
+    success: boolean;
+  }
+}
+
+/**
+ * 1: 只查询刚上传到交易服务，还未提交上链的数据
+ * 2: 只查询提交上链出错的数据
+ * 3: 只查询提交上链成功的数据
+ * 4: 查询包含1和2的数据
+ * 5: 查询还未确认上链是否成功的数据
+ */
+export enum QueryState {
+  SentService = 1,
+  SubmitChainError = 2,
+  SubmitChainSuccess = 3,
+  ServedAndChainError = 4,
+  SubmitChainUnknow = 5
+}
+
+export enum QueryType {
+  ONE = "one",  // 查询一个
+  ALL = "total" // 查询全部
+}
+
+export interface IFetchSubmittedOptions extends IUUID, IBaseRequest{
+  publicKey: string;
+  state: QueryState | number; 
+  count: QueryType | string;
+}
+
+export interface IFetchSubmittedResponse extends IResponse {
+  data: {
+    submitted: boolean;
+  }
+}
+
+export interface ICancelSubmitOptions extends IUUID, IBaseRequest {
+  publicKey: string;
+  signedAddr: string;
+}
+
+export interface ICancelSubmitResponse extends IResponse {
+  data: {
+    canceled: boolean;
+  }
 }
