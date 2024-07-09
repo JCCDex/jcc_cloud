@@ -19,6 +19,7 @@ import {
   ISubmitResponse,
   IFetchSubmittedOptions,
   IFetchSubmittedResponse,
+  ISubmittedData,
   QueryState,
   QueryType,
   ICancelSubmitOptions,
@@ -210,7 +211,7 @@ export default class JCCDexTxPool {
         throw new CloudError(code, msg);
       }
     
-      return { code, msg, data: data as any };
+      return { code, msg, data: {list: data as Array<ISubmittedData>} };
     }
 
   /**

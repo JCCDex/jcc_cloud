@@ -89,9 +89,21 @@ export interface IFetchSubmittedOptions extends IUUID, IBaseRequest{
   count: QueryType | string;
 }
 
+export interface ISubmittedData {
+  id: number,
+  txSign: string,
+  txHash: string,
+  submitCount: number,
+  checkCount: number,
+  txState: number,
+  txAddr: string,
+  txSeq: number,
+  createAt: string,
+  updateAt: string
+}
 export interface IFetchSubmittedResponse extends IResponse {
   data: {
-    submitted: boolean;
+    list: ISubmittedData[];
   }
 }
 
