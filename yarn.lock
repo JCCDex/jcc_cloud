@@ -1531,7 +1531,6 @@ __metadata:
     "@babel/preset-env": ^7.24.6
     "@babel/preset-typescript": ^7.24.6
     "@jccdex/jingtum-lib": ^1.0.2
-    "@swtc/common": ^1.1.1
     "@types/jest": ^29.5.12
     "@typescript-eslint/eslint-plugin": ^7.12.0
     "@typescript-eslint/parser": ^7.12.0
@@ -2552,11 +2551,11 @@ __metadata:
   linkType: hard
 
 "base-x@npm:^3.0.7":
-  version: 3.0.9
-  resolution: "base-x@npm:3.0.9"
+  version: 3.0.10
+  resolution: "base-x@npm:3.0.10"
   dependencies:
     safe-buffer: ^5.0.1
-  checksum: 957101d6fd09e1903e846fd8f69fd7e5e3e50254383e61ab667c725866bec54e5ece5ba49ce385128ae48f9ec93a26567d1d5ebb91f4d56ef4a9cc0d5a5481e8
+  checksum: 52307739559e81d9980889de2359cb4f816cc0eb9a463028fa3ab239ab913d9044a1b47b4520f98e68453df32a457b8ba58b8d0ee7e757fc3fb971f3fa7a1482
   languageName: node
   linkType: hard
 

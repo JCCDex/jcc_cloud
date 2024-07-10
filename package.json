@@ -34,6 +34,7 @@
     "@babel/eslint-parser": "^7.24.6",
     "@babel/preset-env": "^7.24.6",
     "@babel/preset-typescript": "^7.24.6",
+    "@jccdex/jingtum-lib": "^1.0.2",
     "@types/jest": "^29.5.12",
     "@typescript-eslint/eslint-plugin": "^7.12.0",
     "@typescript-eslint/parser": "^7.12.0",
@@ -45,14 +46,12 @@
     "prettier": "^3.3.0",
     "pretty-quick": "^4.0.0",
     "sinon": "^18.0.0",
+    "sm3.js": "^1.0.1",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.12.0"
   },
   "packageManager": "yarn@3.6.3",
   "dependencies": {
-    "@jccdex/jingtum-lib": "^1.0.2",
-    "@swtc/common": "^1.1.1",
-    "axios": "^1.7.2",
-    "sm3.js": "^1.0.1"
+    "axios": "^1.7.2"
   }
 }

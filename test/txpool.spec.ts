@@ -1,17 +1,36 @@
 import sinon from "sinon";
 import JCCDexTxPool from "../src/txpool";
 import { CloudError } from "../src/error";
+
 const sandbox = sinon.createSandbox();
 
 describe("test txpool", () => {
   const baseUrl = "https://whcztranscache.jccdex.cn:8443";
-  const txpool = new JCCDexTxPool("sssss");
+  const JingtumWallet = require("@jccdex/jingtum-lib");
+  const wallet = new JingtumWallet.Wallet("jingtum");
+  const sm3 = require("sm3.js").sm3;
+  const txpool = new JCCDexTxPool("sssss", null, null);
+
   const stub = sandbox.stub(txpool, "fetch");
 
   describe("test setBaseUrl", () => {
     test("should set baseUrl", () => {
       txpool.setBaseUrl(baseUrl);
       expect(txpool.getBaseUrl()).toEqual("https://whcztranscache.jccdex.cn:8443");
+    });
+  });
+
+  describe("test setWallet, getWallet", () => {
+    test("should set baseUrl", () => {
+      txpool.setWallet(wallet);
+      expect(txpool.getWallet()).toEqual(wallet);
+    });
+  });
+
+  describe("test setSm3, getSm3", () => {
+    test("should set baseUrl", () => {
+      txpool.setSm3(sm3);
+      expect(txpool.getSm3()).toEqual(sm3);
     });
   });
 

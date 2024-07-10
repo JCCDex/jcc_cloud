@@ -106,3 +106,14 @@ export const isValidQueryState = (v: number) => {
 export const isValidQueryType = (v: string) => {
   return typeof v === 'string' && (v === QueryType.ALL || v === QueryType.ONE);
 };
+
+// copied from @swtc/common
+export const funcBytesToHex = (bytes: Buffer) => {
+  const hex = [];
+  for (const byte of bytes) {
+      const current = byte < 0 ? byte + 256 : byte;
+      hex.push((current >>> 4).toString(16));
+      hex.push((current & 0xf).toString(16));
+  }
+  return hex.join("").toUpperCase();
+}

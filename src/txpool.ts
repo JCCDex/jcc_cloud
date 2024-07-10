@@ -7,7 +7,8 @@ import {
   isValideSeqs,
   isValidTxList,
   isValidQueryState,
-  isValidQueryType
+  isValidQueryType,
+  funcBytesToHex
 } from "./util";
 import {
   IAccount,
@@ -27,9 +28,6 @@ import {
 } from "./txpoolTypes";
 const assert = require("assert");
 
-const JingtumWallet = require("@jccdex/jingtum-lib");
-const SwtCommon = require("@swtc/common");
-
 export default class JCCDexTxPool {
 
   public fetch;
@@ -40,9 +38,15 @@ export default class JCCDexTxPool {
 
   public queryType = QueryType;
 
-  constructor(baseUrl: string, customFetch?: unknown) {
+  private wallet;
+
+  private sm3;
+
+  constructor(baseUrl: string, wallet: unknown, sm3: unknown, customFetch?: unknown) {
     this.baseUrl = baseUrl;
     this.fetch = customFetch || defaultFetch;
+    this.wallet = wallet;
+    this.sm3 = sm3;
   }
 
   public setBaseUrl(baseUrl: string) {
@@ -51,6 +55,22 @@ export default class JCCDexTxPool {
 
   public getBaseUrl(): string {
     return this.baseUrl;
+  }
+
+  public setWallet(wallet: unknown) {
+    this.wallet = wallet;
+  }
+
+  public getWallet(): unknown {
+    return this.wallet;
+  }
+
+  public setSm3(sm3: unknown) {
+    this.sm3 = sm3;
+  }
+
+  public getSm3(): unknown {
+    return this.sm3;
   }
 
   private isSuccess(code): boolean {
@@ -64,15 +84,14 @@ export default class JCCDexTxPool {
    */
   public getAddressPublicKey(secret: string): IAccount {
     assert(isValidString(secret), "Secret is invalid");
-    const wallet = new JingtumWallet.Wallet("jingtum");
-    assert(wallet.isValidSecret(secret), "Secret is invalid");
+    assert(this.wallet.isValidSecret(secret), "Secret is invalid");
 
-    const KeyPair = wallet.wallet.KeyPair;
+    const KeyPair = this.wallet.wallet.KeyPair;
     const kp = KeyPair.deriveKeyPair(secret);
     const privateKey = kp.privateKey;
     const publicKey = kp.publicKey;
     const address = KeyPair.deriveAddress(publicKey);
-    const signedAddress = KeyPair.sign(SwtCommon.funcBytesToHex(Buffer.from(address)), privateKey);
+    const signedAddress = KeyPair.sign(funcBytesToHex(Buffer.from(address)), privateKey);
     return { address, signedAddress, publicKey };
   }
 
@@ -124,8 +143,7 @@ export default class JCCDexTxPool {
     assert(isValideSeqs(seqs), "Seqs list is invalid");
     assert(seqs.length === txList.length, "Seqs quantity is not equal to tx quantity");
     assert(isValidString(secret), "Secret is invalid");
-    const wallet = new JingtumWallet.Wallet("jingtum");
-    assert(wallet.isValidSecret(secret), "Secret is invalid");
+    assert(this.wallet.isValidSecret(secret), "Secret is invalid");
     delete options.secret;
     
     const account = this.getAddressPublicKey(secret);
@@ -133,7 +151,7 @@ export default class JCCDexTxPool {
     seqs.forEach((seq, index) => {
       const tx = txList[index];
       tx.Sequence = seq;
-      const signed = wallet.sign(tx, secret);
+      const signed = this.wallet.sign(tx, secret);
       signedList.push({
         txSign: signed.blob,
         txHash: signed.hash,
@@ -142,13 +160,12 @@ export default class JCCDexTxPool {
       });
     });
     const dataStr = JSON.stringify(signedList);
-    const sm3 = require("sm3.js").sm3;
-    const hash = sm3().update(dataStr).digest("hex");
-    const KeyPair = wallet.wallet.KeyPair;
+    const hash = this.sm3().update(dataStr).digest("hex");
+    const KeyPair = this.wallet.wallet.KeyPair;
     const privateKey = KeyPair.deriveKeyPair(secret).privateKey;
 
     return {
-      dataHashSign: KeyPair.sign(SwtCommon.funcBytesToHex(Buffer.from(hash)), privateKey),
+      dataHashSign: KeyPair.sign(funcBytesToHex(Buffer.from(hash)), privateKey),
       dataJsonStr: dataStr
     };
   }
