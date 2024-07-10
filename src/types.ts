@@ -337,7 +337,7 @@ export interface IFetchNftTokenIdOptions extends IUUID, IBaseRequest {
 export interface IFetchNftTokenIdResponse extends IResponse {
   data: {
     tokenIds: string[];
-  }
+  };
 }
 
 export enum NftTransactionType {
@@ -697,4 +697,19 @@ export interface IFetchTokenBalanceStatisticResponse extends IResponse {
       value: string;
     }[];
   };
+}
+
+interface IKeypair {
+  privateKey: string;
+  publicKey: string;
+}
+
+export abstract class AbstractKeyPair {
+  public abstract deriveKeyPair(secret: string): IKeypair;
+  public abstract deriveAddress(publicKey: string): string;
+  public abstract sign(data: string, privateKey: string): string;
+  public abstract signTx(data: unknown, privateKey: string): unknown;
+  public abstract isValidSecret(secret: string): boolean;
+  public abstract isValidAddress(address: string): boolean;
+  public abstract hash(message: string): string;
 }
