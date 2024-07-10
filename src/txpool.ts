@@ -5,7 +5,6 @@ import {
   isValidFromChain,
   isValidCount,
   isValideSeqs,
-  isValidTxList,
   isValidQueryState,
   isValidQueryType,
   funcBytesToHex
@@ -24,7 +23,10 @@ import {
   QueryState,
   QueryType,
   ICancelSubmitOptions,
-  ICancelSubmitResponse
+  ICancelSubmitResponse,
+  ICreateExchange,
+  ICancelExchange,
+  IPayExchange
 } from "./txpoolTypes";
 const assert = require("assert");
 
@@ -40,13 +42,13 @@ export default class JCCDexTxPool {
 
   private wallet;
 
-  private sm3;
+  private hashTools;
 
-  constructor(baseUrl: string, wallet: unknown, sm3: unknown, customFetch?: unknown) {
+  constructor(baseUrl: string, wallet: unknown, hashTools: unknown, customFetch?: unknown) {
     this.baseUrl = baseUrl;
     this.fetch = customFetch || defaultFetch;
     this.wallet = wallet;
-    this.sm3 = sm3;
+    this.hashTools = hashTools;
   }
 
   public setBaseUrl(baseUrl: string) {
@@ -65,12 +67,12 @@ export default class JCCDexTxPool {
     return this.wallet;
   }
 
-  public setSm3(sm3: unknown) {
-    this.sm3 = sm3;
+  public setHashTools(hashTools: unknown) {
+    this.hashTools = hashTools;
   }
 
-  public getSm3(): unknown {
-    return this.sm3;
+  public getHashTools(): unknown {
+    return this.hashTools;
   }
 
   private isSuccess(code): boolean {
@@ -129,6 +131,40 @@ export default class JCCDexTxPool {
   }
 
   /**
+   * to check the txList data is valid or not
+   * @param list
+   * @returns {boolean}
+   */
+  private isValidTxList = (v: (ICreateExchange | ICancelExchange | IPayExchange)[]): boolean => {
+    const wallet = this.wallet;
+    return Array.isArray(v) && v.length > 0 && v.every((tx) => {
+      const type = tx.TransactionType as string;
+      switch (type) {
+        case "OfferCreate":
+          return  'Account' in tx && wallet.isValidAddress(tx.Account) &&
+                  'Fee' in tx && typeof tx.Fee === 'number' &&
+                  'Flags' in tx && (tx.Flags === 0x00080000 || tx.Flags === 0) &&
+                  'Platform' in tx && typeof tx.Platform === 'string' &&
+                  'TakerGets' in tx && typeof tx.TakerGets === 'object' &&
+                  'TakerPays' in tx && typeof tx.TakerPays === 'object'
+        case "OfferCancel":
+          return  'Account' in tx && wallet.isValidAddress(tx.Account) &&
+                  'Fee' in tx && typeof tx.Fee === 'number' &&
+                  'Flags' in tx && tx.Flags === 0 &&
+                  'OfferSequence' in tx && Number.isInteger(tx.OfferSequence)
+        case "Payment":
+          return  'Account' in tx && wallet.isValidAddress(tx.Account) &&
+                  'Amount' in tx && (typeof tx.Amount === 'object' || typeof tx.Amount === 'string') &&
+                  'Destination' in tx && wallet.isValidAddress(tx.Destination) &&
+                  'Fee' in tx && typeof tx.Fee === 'number' &&
+                  'Flags' in tx && tx.Flags === 0 &&
+                  'Memos' in tx;
+        default: return false;
+      }
+    });
+  };
+
+  /**
    * Batch sign transactions with the seqs from txpool service
    * @param options {
    *   txList: Array txs: [ ICreateExchange | ICancelExchange | IPayExchange ] types from @jccdex/jingtum-lib
@@ -139,7 +175,7 @@ export default class JCCDexTxPool {
    */
   public async batchSignWithSeqs(options: IBatchSignData): Promise<ITxPoolData> {
     const { txList, seqs, secret } = options;
-    assert(isValidTxList(txList),  "TxList is invalid");
+    assert(this.isValidTxList(txList),  "TxList is invalid");
     assert(isValideSeqs(seqs), "Seqs list is invalid");
     assert(seqs.length === txList.length, "Seqs quantity is not equal to tx quantity");
     assert(isValidString(secret), "Secret is invalid");
@@ -160,7 +196,7 @@ export default class JCCDexTxPool {
       });
     });
     const dataStr = JSON.stringify(signedList);
-    const hash = this.sm3().update(dataStr).digest("hex");
+    const hash = this.hashTools.update(dataStr).digest("hex");
     const KeyPair = this.wallet.wallet.KeyPair;
     const privateKey = KeyPair.deriveKeyPair(secret).privateKey;
 

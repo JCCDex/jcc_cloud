@@ -8,7 +8,7 @@ describe("test txpool", () => {
   const baseUrl = "https://whcztranscache.jccdex.cn:8443";
   const JingtumWallet = require("@jccdex/jingtum-lib");
   const wallet = new JingtumWallet.Wallet("jingtum");
-  const sm3 = require("sm3.js").sm3;
+  const hashTools = require("sm3.js").sm3();
   const txpool = new JCCDexTxPool("sssss", null, null);
 
   const stub = sandbox.stub(txpool, "fetch");
@@ -27,10 +27,10 @@ describe("test txpool", () => {
     });
   });
 
-  describe("test setSm3, getSm3", () => {
+  describe("test setHashTools, getHashTools", () => {
     test("should set baseUrl", () => {
-      txpool.setSm3(sm3);
-      expect(txpool.getSm3()).toEqual(sm3);
+      txpool.setHashTools(hashTools);
+      expect(txpool.getHashTools()).toEqual(hashTools);
     });
   });
 
@@ -149,6 +149,17 @@ describe("test txpool", () => {
     test("should throw error when TxList is invalid", async () => {
       try {
         await txpool.batchSignWithSeqs({ txList: [], seqs: [],secret: "" });
+      } catch (error) {
+        expect(error.message).toEqual("TxList is invalid");
+      }
+      try {
+        await txpool.batchSignWithSeqs({ txList: [{
+          Account: "jhKUg4uyE1f4H3BZbWQ5HXCh99ChZSdpPj",
+          Fee: 10 / 1000000,
+          Flags: 0,
+          OfferSequence: 22976,
+          TransactionType: "12345" // if TransactionType is invalid should throw error
+        }], seqs: [123], secret: "lsfjkjekslf" });
       } catch (error) {
         expect(error.message).toEqual("TxList is invalid");
       }
