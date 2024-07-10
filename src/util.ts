@@ -1,4 +1,5 @@
 import { NFTStatus, NftTransactionType, PageSize, TransactionType, TradeType, OrderType } from "./types";
+import { QueryState, QueryType } from "./txpoolTypes";
 
 export const isDef = (v) => {
   return v !== undefined && v !== null;
@@ -54,3 +55,33 @@ export const convertTimeToDate = (time: number): string => {
   const [month, day, year] = date.split("/");
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 };
+
+export const isValidFromChain = (v: number) => {
+  return v === 0 || v === 1;
+};
+
+export const isValidCount = (v: number) => {
+  return Number.isInteger(v) && v > 0;
+};
+
+export const isValideSeqs = (v: number[]) => {
+  return Array.isArray(v) && v.length > 0 && v.every((i) => Number.isInteger(i));
+}
+
+export const isValidQueryState = (v: number) => {
+  return v in QueryState;
+};
+export const isValidQueryType = (v: string) => {
+  return typeof v === 'string' && (v === QueryType.ALL || v === QueryType.ONE);
+};
+
+// copied from @swtc/common
+export const funcBytesToHex = (bytes: Buffer) => {
+  const hex = [];
+  for (const byte of bytes) {
+      const current = byte < 0 ? byte + 256 : byte;
+      hex.push((current >>> 4).toString(16));
+      hex.push((current & 0xf).toString(16));
+  }
+  return hex.join("").toUpperCase();
+}
