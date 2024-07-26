@@ -69,7 +69,10 @@ import {
   IFetchUserStatisticResponse,
   IUserStatistic,
   IFetchTokenBalanceStatisticOptions,
-  IFetchTokenBalanceStatisticResponse
+  IFetchTokenBalanceStatisticResponse,
+  IFetchLatestTransactionsOptions,
+  IFetchLatestTransactionsResponse,
+  ITransactionRecord
 } from "./types";
 import {
   isDef,
@@ -168,11 +171,12 @@ export default class JCCDexExplorer {
     }
 
     const offers = (data.list as IOffer[]) || [];
+    const count = data.count as number || 0;
     offers.forEach((offer) => {
       offer.time = convertTime(offer.time);
       offer.past = offer.past * 1000;
     });
-    return { code, msg, data: { offers } };
+    return { code, msg, data: { offers, count } };
   }
 
   public async fetchHistoryOrders(options: IFetchHistoryOrdersOptions): Promise<IFetchHistoryOrdersResponse> {
@@ -1017,5 +1021,27 @@ export default class JCCDexExplorer {
         })
       }
     };
+  }
+
+  // get latst 50 transactions record from trading pair (base-counter)
+  public async fetchLatestTransactions(
+    options: IFetchLatestTransactionsOptions
+  ): Promise<IFetchLatestTransactionsResponse> {
+    const base = options.base?.toUpperCase();
+    const counter = options.counter?.toUpperCase();
+    assert(isValidString(base), "Base is invalid");
+    assert(isValidString(counter), "Counter is invalid");
+    const res: IResponse = await this.fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: `/explorer/v1/info/history/${base}-${counter}/more/?uuid=${options.uuid}`,
+      params: {}
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    const records = Object.values(data) as Array<ITransactionRecord>;
+    return { code, msg, data: { records }};
   }
 }

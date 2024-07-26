@@ -142,7 +142,8 @@ describe("test explorer", () => {
               },
               seq: 1000
             }
-          ]
+          ],
+          count: 1
         }
       });
       const res = await explorer.fetchOffers({
@@ -190,7 +191,8 @@ describe("test explorer", () => {
               },
               seq: 1000
             }
-          ]
+          ],
+          count: 1
         }
       });
     });
@@ -3570,6 +3572,156 @@ describe("test explorer", () => {
             {
               time: 1717171200000,
               value: "1221.753962288614"
+            }
+          ]
+        }
+      });
+    });
+  });
+
+  describe("test fetchLatestTransactions", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      await expect(
+        explorer.fetchLatestTransactions({
+          uuid: "jGa9J9TkqtBc",
+          base: "",
+          counter: "jusdt"
+        })
+      ).rejects.toThrow(new Error("Base is invalid"));
+      await expect(
+        explorer.fetchLatestTransactions({
+          uuid: "jGa9J9TkqtBc",
+          base: "ccdao",
+          counter: ""
+        })
+      ).rejects.toThrow(new Error("Counter is invalid"));
+      await expect(
+        explorer.fetchLatestTransactions({
+          uuid: "jGa9J9TkqtBc",
+          base: "ccdao",
+          counter: "jusdt"
+        })
+      ).rejects.toThrow(new CloudError("-1", "error"));
+    });
+
+    test("should return transaction records list", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        data: [
+          {
+            Account: 'j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi',
+            Sequence: 2353561,
+            TakerGets: {
+              currency: 'CCDAO',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '1395.51286856'
+            },
+            TakerPays: {
+              currency: 'JUSDT',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '0.908697223747215'
+            },
+            close_time: 1721885980000,
+            gets_pays: '1535.729208905572',
+            hash: '70805D7AD547A9CCDC3E1EC1E99C1B72F938ED83C662EE6A254ADB3C4734122D',
+            ledger_index: 29203538,
+            matchFlag: 1,
+            matchNum: 1,
+            pays_gets: '0.00065115646313235'
+          },
+          {
+            Account: 'jJcGDhrdkXSzucyvKDfTfVC8LeTAbUaHVn',
+            Sequence: 84128,
+            TakerGets: {
+              currency: 'CCDAO',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '4425.159060898'
+            },
+            TakerPays: {
+              currency: 'JUSDT',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '2.88177980345993'
+            },
+            close_time: 1721885890000,
+            gets_pays: '1535.5646033694366',
+            hash: 'B21BB5EB9762797C5983B537A95FABED09A671F6F60DCAF195BC1FAC15158C78',
+            ledger_index: 29203529,
+            matchFlag: 1,
+            matchNum: 3,
+            pays_gets: '0.00065122626414137'
+          }
+        ]
+      });
+      const res = await explorer.fetchLatestTransactions({
+        uuid: "jGa9J9TkqtBc",
+        base: "ccdao",
+        counter: "jusdt"
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/explorer/v1/info/history/CCDAO-JUSDT/more/?uuid=jGa9J9TkqtBc",
+          params: {}
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          records: [
+            {
+              Account: 'j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi',
+              Sequence: 2353561,
+              TakerGets: {
+                currency: 'CCDAO',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                value: '1395.51286856'
+              },
+              TakerPays: {
+                currency: 'JUSDT',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                value: '0.908697223747215'
+              },
+              close_time: 1721885980000,
+              gets_pays: '1535.729208905572',
+              hash: '70805D7AD547A9CCDC3E1EC1E99C1B72F938ED83C662EE6A254ADB3C4734122D',
+              ledger_index: 29203538,
+              matchFlag: 1,
+              matchNum: 1,
+              pays_gets: '0.00065115646313235'
+            },
+            {
+              Account: 'jJcGDhrdkXSzucyvKDfTfVC8LeTAbUaHVn',
+              Sequence: 84128,
+              TakerGets: {
+                currency: 'CCDAO',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                value: '4425.159060898'
+              },
+              TakerPays: {
+                currency: 'JUSDT',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+                value: '2.88177980345993'
+              },
+              close_time: 1721885890000,
+              gets_pays: '1535.5646033694366',
+              hash: 'B21BB5EB9762797C5983B537A95FABED09A671F6F60DCAF195BC1FAC15158C78',
+              ledger_index: 29203529,
+              matchFlag: 1,
+              matchNum: 3,
+              pays_gets: '0.00065122626414137'
             }
           ]
         }

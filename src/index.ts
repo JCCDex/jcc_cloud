@@ -1,4 +1,5 @@
 import JCCDexExplorer from "./explorer";
+import JCCDexTxPool from "./txpool";
 
 import {
   PageSize,
@@ -21,7 +22,8 @@ export {
   NFTStatus,
   NftTransactionType,
   CloudError,
-  AbstractKeyPair
+  AbstractKeyPair,
+  JCCDexTxPool
 };
 
 export * from "./fetch";
