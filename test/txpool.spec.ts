@@ -120,7 +120,7 @@ describe("test txpool", () => {
     test("should throw error when response is not success", async () => {
       stub.resolves({
         code: "-1",
-        msg: "error"
+        message: "error"
       });
       try {
         await txpool.getSeqsFromTxPool({
@@ -149,7 +149,7 @@ describe("test txpool", () => {
     test("should return Seqs list", async () => {
       stub.resolves({
         code: "0",
-        msg: "",
+        message: "",
         data: ["1", "2", "3"]
       });
       const res = await txpool.getSeqsFromTxPool({
@@ -381,7 +381,7 @@ describe("test txpool", () => {
     test("should throw error when response is not success", async () => {
       stub.resolves({
         code: "-1",
-        msg: "error"
+        message: "error"
       });
       try {
         await txpool.submitToTxPool({
@@ -406,7 +406,7 @@ describe("test txpool", () => {
     test("should return Seqs list", async () => {
       stub.resolves({
         code: "0",
-        msg: "",
+        message: "",
         data: true
       });
       const submitPara = { dataHashSign: "FJekfjke", dataJsonStr: "FJekfjke" };
@@ -466,7 +466,7 @@ describe("test txpool", () => {
     test("should throw error when response is not success", async () => {
       stub.resolves({
         code: "-1",
-        msg: "error"
+        message: "error"
       });
       try {
         await txpool.fetchSubmittedData({
@@ -493,7 +493,7 @@ describe("test txpool", () => {
     test("should return submitted list", async () => {
       stub.resolves({
         code: "0",
-        msg: "",
+        message: "",
         data: [
           {
             id: 1287505,
@@ -590,7 +590,7 @@ describe("test txpool", () => {
     test("should throw error when response is not success", async () => {
       stub.resolves({
         code: "-1",
-        msg: "error"
+        message: "error"
       });
       try {
         await txpool.cancelSubmitChain({ uuid: "", publicKey: "eiofjel", signedAddr: "sfsf" });
@@ -607,7 +607,7 @@ describe("test txpool", () => {
     test("should return submitted list", async () => {
       stub.resolves({
         code: "0",
-        msg: "",
+        message: "",
         data: true
       });
       const options = { uuid: "", publicKey: "eiofjel", signedAddr: "sfsf" };
@@ -627,6 +627,69 @@ describe("test txpool", () => {
         msg: "",
         data: {
           canceled: true
+        }
+      });
+    });
+  });
+
+  describe("test fetchTxPoolQueues", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when when parameters are invalid", async () => {
+      await expect(txpool.fetchTxPoolQueues({ uuid: "", publicKey: "", state: "1", type: "total" })).rejects.toThrow(
+        new Error("PublicKey is invalid")
+      );
+      await expect(txpool.fetchTxPoolQueues({ uuid: "", publicKey: "eiofjel", state: "", type: "total" })).rejects.toThrow(
+        new Error("State is invalid")
+      );
+      await expect(txpool.fetchTxPoolQueues({ uuid: "", publicKey: "eiofjel", state: "2", type: "" })).rejects.toThrow(
+        new Error("Type is invalid")
+      );
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        message: "error"
+      });
+      try {
+        await txpool.fetchTxPoolQueues({ uuid: "", publicKey: "eiofjel", state: "2", type: "total" });
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
+      await expect(txpool.fetchTxPoolQueues({ uuid: "", publicKey: "eiofjel", state: "2", type: "total" })).rejects.toThrow(
+        new CloudError("-1", "error")
+      );
+    });
+
+    test("should return submitted list", async () => {
+      stub.resolves({
+        code: "0",
+        message: "",
+        data: 20
+      });
+      const options = { uuid: "", publicKey: "eiofjel", state: "1", type: "self" };
+      const res = await txpool.fetchTxPoolQueues(options);
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://whcztranscache.jccdex.cn:8443",
+          url: "/tran/api/pool-data/current-count/eiofjel",
+          params: {
+            state: "1",
+            type: "self"
+          }
+        })
+      ).toEqual(true);
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          count: 20
         }
       });
     });

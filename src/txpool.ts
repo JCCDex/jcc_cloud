@@ -7,7 +7,9 @@ import {
   isValideSeqs,
   isValidQueryState,
   isValidQueryType,
-  funcBytesToHex
+  funcBytesToHex,
+  isValidQueuesState,
+  isValidQueuesType
 } from "./util";
 import {
   IAccount,
@@ -26,7 +28,11 @@ import {
   ICancelSubmitResponse,
   ICreateExchange,
   ICancelExchange,
-  IPayExchange
+  IPayExchange,
+  IFetchTxPoolQueuesOptions,
+  IFetchTxPoolQueuesResponse,
+  QueuesState,
+  QueuesType
 } from "./txpoolTypes";
 import { AbstractKeyPair } from "./types";
 const assert = require("assert");
@@ -39,6 +45,10 @@ export default class JCCDexTxPool {
   public queryState = QueryState;
 
   public queryType = QueryType;
+
+  public queuesState = QueuesState;
+
+  public queuesType = QueuesType;
 
   private keypair;
 
@@ -101,12 +111,12 @@ export default class JCCDexTxPool {
         count: options.count
       }
     });
-    const { code, msg, data } = res;
+    const { code, message, data } = res;
     if (!this.isSuccess(code)) {
-      throw new CloudError(code, msg);
+      throw new CloudError(code, message);
     }
 
-    return { code, msg, data: { seqs: data as number[] } };
+    return { code, msg: message, data: { seqs: data as number[] } };
   }
 
   /**
@@ -229,12 +239,12 @@ export default class JCCDexTxPool {
       method: "post",
       data: submitPara
     });
-    const { code, msg, data } = res;
+    const { code, message, data } = res;
     if (!this.isSuccess(code)) {
-      throw new CloudError(code, msg);
+      throw new CloudError(code, message);
     }
 
-    return { code, msg, data: { success: data as boolean } };
+    return { code, msg: message, data: { success: data as boolean } };
   }
 
   /**
@@ -263,12 +273,12 @@ export default class JCCDexTxPool {
         count: count
       }
     });
-    const { code, msg, data } = res;
+    const { code, message, data } = res;
     if (!this.isSuccess(code)) {
-      throw new CloudError(code, msg);
+      throw new CloudError(code, message);
     }
 
-    return { code, msg, data: { list: data as Array<ISubmittedData> } };
+    return { code, msg: message, data: { list: data as Array<ISubmittedData> } };
   }
 
   /**
@@ -291,11 +301,42 @@ export default class JCCDexTxPool {
         signedAddr
       }
     });
-    const { code, msg, data } = res;
+    const { code, message, data } = res;
     if (!this.isSuccess(code)) {
-      throw new CloudError(code, msg);
+      throw new CloudError(code, message);
     }
 
-    return { code, msg, data: { canceled: data as boolean } };
+    return { code, msg: message, data: { canceled: data as boolean } };
+  }
+
+  /**
+   * 获取交易池中的交易数量
+   * @param options {
+   *  publicKey 公钥
+   *  state     查询的状态 1.等待上链 2.上链时出错 3.已提交上链,但等待链上确认
+   *  type      查询的范围 self 仅查询自己的交易 total 查询所有的交易
+   * }
+   * @returns {IFetchTxPoolQueuesResponse}
+   */
+  public async fetchTxPoolQueues(options: IFetchTxPoolQueuesOptions): Promise<IFetchTxPoolQueuesResponse> {
+    const { publicKey, state, type } = options;
+    assert(isValidString(publicKey), "PublicKey is invalid");
+    assert(isValidQueuesState(state), "State is invalid");
+    assert(isValidQueuesType(type), "Type is invalid");
+    const res = await this.fetch({
+      baseURL: this.baseUrl,
+      url: `/tran/api/pool-data/current-count/${publicKey}`,
+      method: "get",
+      params: {
+        state,
+        type
+      }
+    });
+    const { code, message, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, message);
+    }
+
+    return { code, msg: message, data: { count: data as number } };
   }
 }

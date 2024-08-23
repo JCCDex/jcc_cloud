@@ -1,5 +1,5 @@
 import { NFTStatus, NftTransactionType, PageSize, TransactionType, TradeType, OrderType } from "./types";
-import { QueryState, QueryType } from "./txpoolTypes";
+import { QueryState, QueryType, QueuesState, QueuesType } from "./txpoolTypes";
 
 export const isDef = (v) => {
   return v !== undefined && v !== null;
@@ -85,3 +85,13 @@ export const funcBytesToHex = (bytes: Buffer) => {
   }
   return hex.join("").toUpperCase();
 }
+
+export const isValidQueuesState = (v: string) => {
+  return typeof v === 'string' &&
+    (v === QueuesState.WaittingSubmit
+      || v === QueuesState.SubmitError 
+      || v === QueuesState.WaittingConfirm);
+};
+export const isValidQueuesType = (v: string) => {
+  return typeof v === 'string' && (v === QueuesType.SELF || v === QueuesType.TOTAL);
+};

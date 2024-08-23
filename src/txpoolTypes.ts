@@ -167,3 +167,35 @@ export interface IPayExchange {
   TransactionType: string;
   Memos: IMemo[];
 }
+
+/**     队列的状态
+ * 1: 交易池中 等待上链的数量
+ * 2: 交易池中 上链时出错的数量
+ * 3: 交易池中 已提交上链,但等待链上确认的数量
+ */
+export enum QueuesState {
+  WaittingSubmit = "1",
+  SubmitError = "2",
+  WaittingConfirm = "3"
+}
+
+/**
+ * self:  查询交易池中  当前钱包的交易数量
+ * total: 查询交易池中  所总的交易数量
+ */
+export enum QueuesType {
+  SELF = "self",
+  TOTAL = "total"
+}
+
+export interface IFetchTxPoolQueuesOptions extends IUUID, IBaseRequest {
+  publicKey: string;
+  state: QueuesState | string;
+  type: QueuesType | string;
+}
+
+export interface IFetchTxPoolQueuesResponse extends IResponse {
+  data: {
+    count: number;
+  }
+}
