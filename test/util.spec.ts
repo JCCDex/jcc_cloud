@@ -1,4 +1,4 @@
-import { isValidNftTransactionType, isValidTransactionType, isValidOrderType } from "../src/util";
+import { isValidNftTransactionType, isValidTransactionType, isValidOrderType, convertTimeToDate } from "../src/util";
 import { NftTransactionType, OrderType, TransactionType } from "../src/types";
 
 describe("test isValidTransactionType", () => {
@@ -54,6 +54,13 @@ describe("test isValidTransactionType", () => {
       expect(isValidTransactionType("OfferCreate,Payment,Invalid")).toBe(false);
       expect(isValidTransactionType("OfferCreate,Payment, Invalid")).toBe(false);
       expect(isValidTransactionType({})).toBe(false);
+    });
+  });
+
+  describe("test convertTimeToDate", () => {
+    it("should convert explorerTime to yyyy-mm-dd", () => {
+      const explorerTime = 784340200;
+      expect(convertTimeToDate(explorerTime)).toBe("2024-11-08");
     });
   });
 });

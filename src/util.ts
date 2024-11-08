@@ -1,4 +1,4 @@
-import { NFTStatus, NftTransactionType, PageSize, TransactionType, TradeType, OrderType } from "./types";
+import { NFTStatus, NftTransactionType, PageSize, TransactionType, TradeType, OrderType, OfferSearchType } from "./types";
 import { QueryState, QueryType, QueuesState, QueuesType } from "./txpoolTypes";
 
 export const isDef = (v) => {
@@ -50,6 +50,7 @@ export const convertTime = (time: number): number => {
   return (time + 946684800) * 1000;
 };
 
+// 将浏览器时间戳+偏移量后格式化为: yyyy-mm-dd
 export const convertTimeToDate = (time: number): string => {
   const date = new Date(convertTime(time)).toLocaleDateString();
   const [month, day, year] = date.split("/");
@@ -94,4 +95,8 @@ export const isValidQueuesState = (v: string) => {
 };
 export const isValidQueuesType = (v: string) => {
   return typeof v === 'string' && (v === QueuesType.SELF || v === QueuesType.TOTAL);
+};
+
+export const isValidOfferSearchType = (v: number) => {
+  return typeof v === 'number' && (v === OfferSearchType.Status || v === OfferSearchType.History || v === OfferSearchType.Both);
 };

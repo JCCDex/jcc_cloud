@@ -9,6 +9,9 @@ import {
   IFetchBalancesResponse,
   IFetchOffersOptions,
   IFetchOffersResponse,
+  IFetchOfferDetailOptions,
+  IFetchOfferDetailResponse,
+  IOfferHistoryInfo,
   IFetchHistoryOrdersOptions,
   IFetchHistoryOrdersResponse,
   IFetchIssuedTokensOptions,
@@ -72,7 +75,7 @@ import {
   IFetchTokenBalanceStatisticResponse,
   IFetchLatestTransactionsOptions,
   IFetchLatestTransactionsResponse,
-  ITransactionRecord
+  ITransactionRecord,
 } from "./types";
 import {
   isDef,
@@ -84,7 +87,9 @@ import {
   isValidTradeType,
   isValidOrderType,
   convertTime,
-  isValidString
+  isValidString,
+  isValidCount,
+  isValidOfferSearchType
 } from "./util";
 const assert = require("assert");
 
@@ -156,6 +161,7 @@ export default class JCCDexExplorer {
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
+      // 后续等待新的分析程序数据完全后切换到新接口，释放wallet分析程序的负担 "/explorer/v1/offer/list/" + options.uuid
       url: "/wallet/offer/" + options.uuid,
       params: {
         w: address,
@@ -177,6 +183,49 @@ export default class JCCDexExplorer {
       offer.past = offer.past * 1000;
     });
     return { code, msg, data: { offers, count } };
+  }
+
+  public async fetchOffersDetail(options: IFetchOfferDetailOptions): Promise<IFetchOfferDetailResponse> {
+    const searchType = options.searchType || 0;
+    const seq = options.seq;
+    const address = options.address;
+    assert(isValidOfferSearchType(searchType), "searchType is invalid");
+    assert(isValidCount(seq), "Seq is invalid");
+    assert(isValidString(address), "Address is invalid");
+    const res: IResponse = await this.fetch({
+      method: "get",
+      baseURL: this.baseUrl,
+      url: "/explorer/v1/offer/state/" + options.uuid,
+      params: {
+        w: address,
+        seq,
+        trans: searchType
+      }
+    });
+    const { code, msg, data } = res;
+    if (!this.isSuccess(code)) {
+      throw new CloudError(code, msg);
+    }
+    let offerStatus = null, offerHistory = null;
+    if (searchType === 0 && data.wallet) {
+      offerStatus = Object.assign(data, {});
+    } else if (searchType === 1) {
+      offerHistory = Array.isArray(data) ? data : [];
+    } else if (searchType === 2 && data.state && data.trans) {
+      offerStatus = data.state ? Object.assign(data.state, {}) : {};
+      offerHistory = (data.trans && Array.isArray(data.trans)) ? data.trans : [];
+    }
+
+    if (offerStatus && offerStatus.wallet) {
+      offerStatus.updatedTime = convertTime(offerStatus.updatedTime);
+      offerStatus.createdTime = convertTime(offerStatus.createdTime);
+    }
+    if (offerHistory) {
+      offerHistory.forEach((offer: IOfferHistoryInfo) => {
+        offer.time = convertTime(offer.time);
+      });
+    }
+    return { code, msg, data: { offerStatus, offerHistory } };
   }
 
   public async fetchHistoryOrders(options: IFetchHistoryOrdersOptions): Promise<IFetchHistoryOrdersResponse> {

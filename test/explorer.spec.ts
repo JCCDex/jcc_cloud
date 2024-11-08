@@ -8,6 +8,7 @@ const sandbox = sinon.createSandbox();
 describe("test explorer", () => {
   const baseUrl = "https://swtcscan.jccdex.cn";
   const explorer = new JCCDexExplorer(baseUrl);
+  explorer.setBaseUrl(baseUrl);
   const stub = sandbox.stub(explorer, "fetch");
 
   describe("test fetchBalances", () => {
@@ -195,6 +196,344 @@ describe("test explorer", () => {
           count: 1
         }
       });
+    });
+  });
+
+  describe("test fetchOffersDetail", () => {
+    afterEach(() => {
+      sandbox.reset();
+    });
+
+    test("should throw error when params is invalid", async () => {
+      await expect(
+        explorer.fetchOffersDetail({
+          uuid: "jGa9J9TkqtBc",
+          address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+          seq: 0
+        })
+      ).rejects.toThrow(new Error("Seq is invalid"));
+      await expect(
+        explorer.fetchOffersDetail({
+          uuid: "jGa9J9TkqtBc",
+          address: "",
+          seq: 12332,
+        })
+      ).rejects.toThrow(new Error("Address is invalid"));
+    });
+
+    test("should throw error when response is not success", async () => {
+      stub.resolves({
+        code: "-1",
+        msg: "error"
+      });
+      try {
+        await explorer.fetchOffersDetail({
+          uuid: "jGa9J9TkqtBc",
+          address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+          seq: 83548
+        });
+      } catch (error) {
+        expect(error instanceof CloudError).toEqual(true);
+        expect(error.code).toEqual("-1");
+        expect(error.message).toEqual("error");
+      }
+      await expect(
+        explorer.fetchOffersDetail({
+          uuid: "jGa9J9TkqtBc",
+          address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+          seq: 123
+        })
+      ).rejects.toThrow(new CloudError("-1", "error"));
+    });
+
+    test("should return offerDetials when searchType = 0", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        data: {
+          wallet: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+          seq: 83567,
+          status: 1,
+          updatedTime: 1000000000,
+          hash: '2C666A3F3880FD0687A81BF55399BA1A48408D780BD256E2657E4D3CC1649BBD',
+          block: 30117430,
+          index: 1,
+          createdTime: 1000000000,
+          takerGets: {
+            currency: 'JTRX',
+            issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+            value: '6.792802012695457'
+          },
+          takerPays: {
+            currency: 'JETH',
+            issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+            value: '0.000382770799607'
+          },
+          takerGetsInit: {
+            currency: 'JTRX',
+            issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+            value: '6.792802012695457'
+          },
+          takerPaysInit: {
+            currency: 'JETH',
+            issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+            value: '0.000382770799607'
+          }
+        }
+      });
+      const res = await explorer.fetchOffersDetail({
+        uuid: "jGa9J9TkqtBc",
+        address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+        seq: 123,
+        searchType: 0
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/explorer/v1/offer/state/jGa9J9TkqtBc",
+          params: {
+            w: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+            seq: 123,
+            trans: 0
+          }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          offerStatus: {
+            wallet: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+            seq: 83567,
+            status: 1,
+            updatedTime: 1946684800000,
+            hash: '2C666A3F3880FD0687A81BF55399BA1A48408D780BD256E2657E4D3CC1649BBD',
+            block: 30117430,
+            index: 1,
+            createdTime: 1946684800000,
+            takerGets: {
+              currency: 'JTRX',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '6.792802012695457'
+            },
+            takerPays: {
+              currency: 'JETH',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '0.000382770799607'
+            },
+            takerGetsInit: {
+              currency: 'JTRX',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '6.792802012695457'
+            },
+            takerPaysInit: {
+              currency: 'JETH',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '0.000382770799607'
+            }
+          },
+          offerHistory: null
+        }
+      });
+    });
+
+    test("should return offer's trade list when searchType = 1", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        data: [
+          {
+            wallet: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+            seq: 83567,
+            block: 30117430,
+            index: 1,
+            success: 'tesSUCCESS',
+            hash: '2C666A3F3880FD0687A81BF55399BA1A48408D780BD256E2657E4D3CC1649BBD',
+            account: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+            accountSeq: 83567,
+            time: 1000000000,
+            type: 'OfferCreate',
+            completed: false,
+            takerGetsBefore: [],
+            takerPaysBefore: []
+          }
+        ]
+      });
+      const res = await explorer.fetchOffersDetail({
+        uuid: "jGa9J9TkqtBc",
+        address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+        seq: 123,
+        searchType: 1
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/explorer/v1/offer/state/jGa9J9TkqtBc",
+          params: {
+            w: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+            seq: 123,
+            trans: 1
+          }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data: {
+          offerStatus: null,
+          offerHistory: [
+            {
+              wallet: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+              seq: 83567,
+              block: 30117430,
+              index: 1,
+              success: 'tesSUCCESS',
+              hash: '2C666A3F3880FD0687A81BF55399BA1A48408D780BD256E2657E4D3CC1649BBD',
+              account: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+              accountSeq: 83567,
+              time: 1946684800000,
+              type: 'OfferCreate',
+              completed: false,
+              takerGetsBefore: [],
+              takerPaysBefore: []
+            }
+          ]
+        }
+      });
+    });
+
+    test("should return offer's status and trade list when searchType = 2", async () => {
+      stub.resolves({
+        code: "0",
+        msg: "",
+        data: {
+          state: {
+            wallet: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+            seq: 83567,
+            status: 1,
+            updatedTime: 1000000000,
+            hash: '2C666A3F3880FD0687A81BF55399BA1A48408D780BD256E2657E4D3CC1649BBD',
+            block: 30117430,
+            index: 1,
+            createdTime: 1000000000,
+            takerGets: {
+              currency: 'JTRX',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '6.792802012695457'
+            },
+            takerPays: {
+              currency: 'JETH',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '0.000382770799607'
+            },
+            takerGetsInit: {
+              currency: 'JTRX',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '6.792802012695457'
+            },
+            takerPaysInit: {
+              currency: 'JETH',
+              issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+              value: '0.000382770799607'
+            }
+          },
+          trans: [
+            {
+              wallet: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+              seq: 83567,
+              block: 30117430,
+              index: 1,
+              success: 'tesSUCCESS',
+              hash: '2C666A3F3880FD0687A81BF55399BA1A48408D780BD256E2657E4D3CC1649BBD',
+              account: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+              accountSeq: 83567,
+              time: 1000000000,
+              type: 'OfferCreate',
+              completed: false,
+              takerGetsBefore: [],
+              takerPaysBefore: []
+            }
+          ]
+        }
+      });
+      const res = await explorer.fetchOffersDetail({
+        uuid: "jGa9J9TkqtBc",
+        address: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+        seq: 123,
+        searchType: 2
+      });
+
+      expect(
+        stub.calledOnceWithExactly({
+          method: "get",
+          baseURL: "https://swtcscan.jccdex.cn",
+          url: "/explorer/v1/offer/state/jGa9J9TkqtBc",
+          params: {
+            w: "j4rmEZiaTdXBkgzXPdsu1JRBf5onngqfUi",
+            seq: 123,
+            trans: 2
+          }
+        })
+      ).toEqual(true);
+
+      expect(res).toEqual({
+        code: "0",
+        msg: "",
+        data:{
+        offerStatus: {
+          wallet: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+          seq: 83567,
+          status: 1,
+          updatedTime: 1946684800000,
+          hash: '2C666A3F3880FD0687A81BF55399BA1A48408D780BD256E2657E4D3CC1649BBD',
+          block: 30117430,
+          index: 1,
+          createdTime: 1946684800000,
+          takerGets: {
+            currency: 'JTRX',
+            issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+            value: '6.792802012695457'
+          },
+          takerPays: {
+            currency: 'JETH',
+            issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+            value: '0.000382770799607'
+          },
+          takerGetsInit: {
+            currency: 'JTRX',
+            issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+            value: '6.792802012695457'
+          },
+          takerPaysInit: {
+            currency: 'JETH',
+            issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or',
+            value: '0.000382770799607'
+          }
+        },
+        offerHistory: [
+          {
+            wallet: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+            seq: 83567,
+            block: 30117430,
+            index: 1,
+            success: 'tesSUCCESS',
+            hash: '2C666A3F3880FD0687A81BF55399BA1A48408D780BD256E2657E4D3CC1649BBD',
+            account: 'jJME8Qhr95qqycYunWyknF8KZ7FByg4PbL',
+            accountSeq: 83567,
+            time: 1946684800000,
+            type: 'OfferCreate',
+            completed: false,
+            takerGetsBefore: [],
+            takerPaysBefore: []
+          }
+        ]
+      }});
     });
   });
 
@@ -2801,6 +3140,16 @@ describe("test explorer", () => {
   describe("test fetchTokensCirculationInfo", () => {
     afterEach(() => {
       sandbox.reset();
+    });
+
+    test("should throw error when issue if invalid", async () => {
+      await expect(
+        explorer.fetchTokensCirculationInfo({
+          uuid: "jGa9J9TkqtBc",
+          token: "usdt",
+          issuer: ""
+        })
+      ).rejects.toThrow(new Error("Issuer is invalid"));
     });
 
     test("should throw error when response is not success", async () => {

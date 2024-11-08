@@ -73,6 +73,58 @@ export interface IFetchOffersResponse extends IResponse {
   };
 }
 
+export enum OfferSearchType {
+  Status = 0,
+  History = 1,
+  Both = 2
+}
+
+export interface IFetchOfferDetailOptions extends IUUID, IBaseRequest {
+  address: string; // 要查询的Offer的所属钱包地址
+  seq: number; // 要查询的Offer的序列号
+  searchType?: OfferSearchType; // 查询类型，0:只查询Offer的状态; 1:只查询Offer的交易历史; 2:两者皆查询;
+}
+
+export interface IOfferStatusInfo {
+  wallet:	string; // 钱包地址
+  seq:	number; // 委托单序列号
+  status:	number; // 订单状态，整型（1-新建pending（没有任何成交）、2-部分成交partially、3-完全成交completed、4-取消cancelled、5-挂单失败failed）
+  takerGets:	IToken; // 订单当前的付出token（null表示订单已经结束）
+  takerPays:	IToken; // 订单当前的得到token（null表示订单已经结束）
+  takerGetsInit: IToken; // 订单创建时的付出token
+  takerPaysInit: IToken; // 订单创建时的得到token
+  hash:	string; // 订单的交易哈希
+  block:	number; // 订单所在区块高度
+  index:	number; // 订单在区块内的序号
+  createdTime:	number; // 订单创建时间（区块时间）
+  updatedTime:	number; // 订单修改时间（区块时间）
+}
+export interface IOfferHistoryInfo {
+  wallet:	string; // 钱包地址
+  seq:	number; // 订单序列号
+  block:	number; // 交易所在的区块号
+  index:	number; // 交易所在的区块内编号
+  success:	string; // 交易结果
+  takerGets:	IToken; // 实际成交的付出token
+  takerPays:	IToken; // 实际成交的得到token
+  takerGetsBefore:	IToken; // 成交前挂单的付出token
+  takerPaysBefore:	IToken; // 成交前挂单的得到token
+  hash:	string; // 交易哈希
+  account:	string; // 交易对方的钱包地址
+  accountSeq:	number; // 交易对方的订单序列号
+  matchFlag?:	number; // 撮合标记，整型（3表示三方撮合，没有撮合则没有该字段）
+  time:	number; // 交易时间（区块时间）
+  type:  string; // 交易类型（"OfferCreate"-主动挂单 "OfferAffect"-被动成交 "OfferCancel"-撤消订单）
+  complete:	boolean; // 订单是否结束
+}
+
+export interface IFetchOfferDetailResponse extends IResponse {
+  data: {
+    offerStatus?: IOfferStatusInfo;
+    offerHistory?: IOfferHistoryInfo[];
+  };
+}
+
 export enum OrderType {
   OfferCreate = "OfferCreate",
   OfferAffect = "OfferAffect",
