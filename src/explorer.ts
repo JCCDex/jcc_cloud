@@ -89,9 +89,9 @@ import {
   convertTime,
   isValidString,
   isValidCount,
-  isValidOfferSearchType
+  isValidOfferSearchType,
+  assertValid
 } from "./util";
-const assert = require("assert");
 
 export default class JCCDexExplorer {
   public fetch;
@@ -107,6 +107,7 @@ export default class JCCDexExplorer {
   private baseUrl: string;
 
   constructor(baseUrl: string, customFetch?: unknown) {
+    assertValid(isValidString(baseUrl), "baseUrl is invalid");
     this.baseUrl = baseUrl;
     this.fetch = customFetch || defaultFetch;
   }
@@ -121,11 +122,12 @@ export default class JCCDexExplorer {
 
   public async fetchBalances(options: IFetchBalancesOptions): Promise<IFetchBalancesResponse> {
     const address = options.address;
-    assert(isValidString(address), "Address is invalid");
+    assertValid(isValidString(options.uuid), "UUID is invalid");
+    assertValid(isValidString(address), "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/wallet/balance/" + options.uuid,
+      url: "/wallet/balance/" + encodeURIComponent(options.uuid),
       params: {
         w: address
       }
@@ -154,15 +156,15 @@ export default class JCCDexExplorer {
     const size = options.size || this.pageSize.TWENTY;
     const buyOrSell = options.buyOrSell || this.tradeType.ALL;
     const address = options.address;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(isValidTradeType(buyOrSell), "buyOrSell is invalid");
-    assert(isValidString(address), "Address is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
+    assertValid(isValidTradeType(buyOrSell), "buyOrSell is invalid");
+    assertValid(isValidString(address), "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
       // 后续等待新的分析程序数据完全后切换到新接口，释放wallet分析程序的负担 "/explorer/v1/offer/list/" + options.uuid
-      url: "/wallet/offer/" + options.uuid,
+      url: "/wallet/offer/" + encodeURIComponent(options.uuid),
       params: {
         w: address,
         p: page,
@@ -189,13 +191,13 @@ export default class JCCDexExplorer {
     const searchType = options.searchType || 0;
     const seq = options.seq;
     const address = options.address;
-    assert(isValidOfferSearchType(searchType), "searchType is invalid");
-    assert(isValidCount(seq), "Seq is invalid");
-    assert(isValidString(address), "Address is invalid");
+    assertValid(isValidOfferSearchType(searchType), "searchType is invalid");
+    assertValid(isValidCount(seq), "Seq is invalid");
+    assertValid(isValidString(address), "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/explorer/v1/offer/state/" + options.uuid,
+      url: "/explorer/v1/offer/state/" + encodeURIComponent(options.uuid),
       params: {
         w: address,
         seq,
@@ -233,14 +235,14 @@ export default class JCCDexExplorer {
     const size = options.size || this.pageSize.TWENTY;
     const buyOrSell = options.buyOrSell || this.tradeType.ALL;
     const type = options.type || "";
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(isValidTradeType(buyOrSell), "buyOrSell is invalid");
-    assert(isValidOrderType(type), "type is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
+    assertValid(isValidTradeType(buyOrSell), "buyOrSell is invalid");
+    assertValid(isValidOrderType(type), "type is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/wallet/trans/" + options.uuid,
+      url: "/wallet/trans/" + encodeURIComponent(options.uuid),
       params: {
         w: options.address,
         p: page,
@@ -266,10 +268,12 @@ export default class JCCDexExplorer {
   }
 
   public async fetchIssuedTokens(options: IFetchIssuedTokensOptions): Promise<IFetchIssuedTokensResponse> {
+    assertValid(isValidString(options.uuid), "UUID is invalid");
+    assertValid(isValidString(options.address), "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/wallet/fingate_tokenlist/" + options.uuid,
+      url: "/wallet/fingate_tokenlist/" + encodeURIComponent(options.uuid),
       params: {
         w: options.address
       }
@@ -287,13 +291,13 @@ export default class JCCDexExplorer {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
     const address = options.address;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(isValidString(address), "Address is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
+    assertValid(isValidString(address), "Address is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/wallet/trans/fee/" + options.uuid,
+      url: "/wallet/trans/fee/" + encodeURIComponent(options.uuid),
       params: {
         w: address,
         p: page,
@@ -326,13 +330,13 @@ export default class JCCDexExplorer {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
     const block = options.blockNumber;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(typeof block === "number" && block > 0, "Block number is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
+    assertValid(typeof block === "number" && block > 0, "Block number is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/block/trans/" + options.uuid,
+      url: "/block/trans/" + encodeURIComponent(options.uuid),
       params: {
         b: block,
         p: page,
@@ -357,10 +361,11 @@ export default class JCCDexExplorer {
   }
 
   public async fetchLatestSixBlocks(options: IFetchLatestSixBlocksOptions): Promise<IFetchLatestSixBlocksResponse> {
+    assertValid(isValidString(options.uuid), "UUID is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/block/new/" + options.uuid,
+      url: "/block/new/" + encodeURIComponent(options.uuid),
       params: {}
     });
     const { code, msg, data } = res;
@@ -381,12 +386,12 @@ export default class JCCDexExplorer {
   public async fetchAllBlocks(options: IFetchAllBlocksOptions): Promise<IFetchAllBlocksResponse> {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/block/all/" + options.uuid,
+      url: "/block/all/" + encodeURIComponent(options.uuid),
       params: {
         p: page,
         s: size
@@ -410,12 +415,12 @@ export default class JCCDexExplorer {
   public async fetchIssuedNfts(options: IFetchIssuerNftsOptions): Promise<IFetchIssuerNftsResponse> {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/explorer/v1/nft/config/all/" + options.uuid,
+      url: "/explorer/v1/nft/config/all/" + encodeURIComponent(options.uuid),
       params: {
         i: options.issuer,
         p: page,
@@ -452,10 +457,11 @@ export default class JCCDexExplorer {
   public async fetchNftsName(
     options: IFetchNftsNameOptions
   ): Promise<IFetchNftsNameResponse | IFetchAllNftsNameResponse> {
+    assertValid(isValidString(options.uuid), "UUID is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/explorer/v1/nft/all/" + options.uuid,
+      url: "/explorer/v1/nft/all/" + encodeURIComponent(options.uuid),
       params: {
         n: options.tokenName || ""
       }
@@ -489,10 +495,11 @@ export default class JCCDexExplorer {
   }
 
   public async fetchNftTokenId(options: IFetchNftTokenIdOptions): Promise<IFetchNftTokenIdResponse> {
+    assertValid(isValidString(options.uuid), "UUID is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/explorer/v1/nft/all/" + options.uuid,
+      url: "/explorer/v1/nft/all/" + encodeURIComponent(options.uuid),
       params: {
         k: options.tokenId || ""
       }
@@ -514,15 +521,15 @@ export default class JCCDexExplorer {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
     const { tokenId, address, type } = options;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(isDef(tokenId) || isDef(address), 'At least one parameter is required in "tokenId, address"');
-    assert(isValidNftTransactionType(type), 'The value of "type" is invalid');
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
+    assertValid(isDef(tokenId) || isDef(address), 'At least one parameter is required in "tokenId, address"');
+    assertValid(isValidNftTransactionType(type), 'The value of "type" is invalid');
 
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/explorer/v1/nft/transfer/" + options.uuid,
+      url: "/explorer/v1/nft/transfer/" + encodeURIComponent(options.uuid),
       params: {
         w: address,
         k: tokenId,
@@ -573,10 +580,11 @@ export default class JCCDexExplorer {
 
   public async fetchNftConfigs(options: IFetchNftConfigsRequest): Promise<IFetchNftConfigResponse> {
     const { issuer, fundCodeName, uuid } = options;
+    assertValid(isValidString(uuid), "UUID is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/explorer/v1/nft/config/" + uuid,
+      url: "/explorer/v1/nft/config/" + encodeURIComponent(uuid),
       params: {
         n: fundCodeName,
         w: issuer
@@ -614,17 +622,17 @@ export default class JCCDexExplorer {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
     const { tokenId, address, issuer, fundCodeName, valid } = options;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
+    assertValid(
       isDef(tokenId) || isDef(address) || isDef(issuer) || isDef(fundCodeName),
       'At least one parameter is required in "tokenId, address, issuer, fundCodeName"'
     );
-    assert(isValidStatus(valid), 'The value of "valid" is invalid');
+    assertValid(isValidStatus(valid), 'The value of "valid" is invalid');
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/explorer/v1/nft/tokeninfo/" + options.uuid,
+      url: "/explorer/v1/nft/tokeninfo/" + encodeURIComponent(options.uuid),
       params: {
         k: tokenId,
         w: address,
@@ -670,10 +678,11 @@ export default class JCCDexExplorer {
   }
 
   public async fetchLatestSixHash(options: IFetchLatestSixHashOptions): Promise<IFetchLatestSixHashResponse> {
+    assertValid(isValidString(options.uuid), "UUID is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/trans/new/" + options.uuid,
+      url: "/trans/new/" + encodeURIComponent(options.uuid),
       params: {}
     });
     const { code, msg, data } = res;
@@ -697,14 +706,14 @@ export default class JCCDexExplorer {
     const size = options.size || this.pageSize.TWENTY;
     const type = options.type || "";
     const tradeType = options.buyOrSell || this.tradeType.ALL;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(isValidTransactionType(type), "Type is invalid");
-    assert(isValidTradeType(tradeType), "buyOrSell is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
+    assertValid(isValidTransactionType(type), "Type is invalid");
+    assertValid(isValidTradeType(tradeType), "buyOrSell is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/trans/all/" + options.uuid,
+      url: "/trans/all/" + encodeURIComponent(options.uuid),
       params: {
         p: page,
         s: size,
@@ -739,11 +748,11 @@ export default class JCCDexExplorer {
     options: IFetchHashDetailOptions
   ): Promise<IFetchBlockHashDetailResponse | IFetchTransHashDetailResponse> {
     const hash = options.hash;
-    assert(isValidString(hash), "Hash is invalid");
+    assertValid(isValidString(hash), "Hash is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/hash/detail/" + options.uuid,
+      url: "/hash/detail/" + encodeURIComponent(options.uuid),
       params: {
         h: hash
       }
@@ -811,13 +820,13 @@ export default class JCCDexExplorer {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
     const hash = options.blockHash;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(isValidString(hash), "Hash is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
+    assertValid(isValidString(hash), "Hash is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/hash/trans/" + options.uuid,
+      url: "/hash/trans/" + encodeURIComponent(options.uuid),
       params: {
         h: hash,
         p: page,
@@ -844,12 +853,12 @@ export default class JCCDexExplorer {
   public async fetchTokensInfo(options: IFetchTokensOptions): Promise<IFetchTokensResponse> {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/sum/tokenlist/" + options.uuid,
+      url: "/sum/tokenlist/" + encodeURIComponent(options.uuid),
       params: {
         p: page,
         s: size,
@@ -878,16 +887,16 @@ export default class JCCDexExplorer {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
     const { token, issuer } = options;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(isValidString(token), "Token is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
+    assertValid(isValidString(token), "Token is invalid");
     if (!issuer) {
-      assert(token.toUpperCase().startsWith("SWT"), "Issuer is invalid");
+      assertValid(token.toUpperCase().startsWith("SWT"), "Issuer is invalid");
     }
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/sum/list/" + options.uuid,
+      url: "/sum/list/" + encodeURIComponent(options.uuid),
       params: {
         p: page,
         s: size,
@@ -934,11 +943,11 @@ export default class JCCDexExplorer {
     options: IFetchTokensListOptions
   ): Promise<IFetchTokensListResponse | IFetchAllTokensListResponse> {
     const keyword = options.keyword || "";
-    assert(typeof keyword === "string", "keyword is invalid");
+    assertValid(typeof keyword === "string", "keyword is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/sum/all/" + options.uuid,
+      url: "/sum/all/" + encodeURIComponent(options.uuid),
       params: {
         t: keyword.toUpperCase()
       }
@@ -979,10 +988,11 @@ export default class JCCDexExplorer {
   public async fetchTokensTradeStatistic(
     options: IFetchTokenTradeStatisticOptions
   ): Promise<IFetchTokenTradeStatisticResponse> {
+    assertValid(isValidString(options.uuid), "UUID is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/sum/trans_num/" + options.uuid,
+      url: "/sum/trans_num/" + encodeURIComponent(options.uuid),
       params: {}
     });
 
@@ -1005,10 +1015,11 @@ export default class JCCDexExplorer {
   }
 
   public async fetchNewUserStatistic(options: IFetchUserStatisticOptions): Promise<IFetchUserStatisticResponse> {
+    assertValid(isValidString(options.uuid), "UUID is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/sum/users_num/" + options.uuid,
+      url: "/sum/users_num/" + encodeURIComponent(options.uuid),
       params: {}
     });
 
@@ -1035,14 +1046,14 @@ export default class JCCDexExplorer {
     const page = options.page || 0;
     const size = options.size || this.pageSize.TWENTY;
     const { address, token, beginTime, endTime } = options;
-    assert(isValidPage(page), "Page is invalid");
-    assert(isValidSize(size), "Size is invalid");
-    assert(isValidString(address), "Address is invalid");
-    assert(isValidString(token), "Token is invalid");
+    assertValid(isValidPage(page), "Page is invalid");
+    assertValid(isValidSize(size), "Size is invalid");
+    assertValid(isValidString(address), "Address is invalid");
+    assertValid(isValidString(token), "Token is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: "/sum/profit/balance/" + options.uuid,
+      url: "/sum/profit/balance/" + encodeURIComponent(options.uuid),
       params: {
         w: address,
         t: token,
@@ -1078,13 +1089,14 @@ export default class JCCDexExplorer {
   ): Promise<IFetchLatestTransactionsResponse> {
     const base = options.base?.toUpperCase();
     const counter = options.counter?.toUpperCase();
-    assert(isValidString(base), "Base is invalid");
-    assert(isValidString(counter), "Counter is invalid");
+    assertValid(isValidString(base), "Base is invalid");
+    assertValid(isValidString(counter), "Counter is invalid");
+    assertValid(isValidString(options.uuid), "UUID is invalid");
     const res: IResponse = await this.fetch({
       method: "get",
       baseURL: this.baseUrl,
-      url: `/explorer/v1/info/history/${base}-${counter}/more/?uuid=${options.uuid}`,
-      params: {}
+      url: `/explorer/v1/info/history/${encodeURIComponent(base)}-${encodeURIComponent(counter)}/more/`,
+      params: { uuid: options.uuid }
     });
     const { code, msg, data } = res;
     if (!this.isSuccess(code)) {

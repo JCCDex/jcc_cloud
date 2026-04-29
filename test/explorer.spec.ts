@@ -4020,8 +4020,8 @@ describe("test explorer", () => {
         stub.calledOnceWithExactly({
           method: "get",
           baseURL: "https://swtcscan.jccdex.cn",
-          url: "/explorer/v1/info/history/CCDAO-JUSDT/more/?uuid=jGa9J9TkqtBc",
-          params: {}
+          url: "/explorer/v1/info/history/CCDAO-JUSDT/more/",
+          params: { uuid: "jGa9J9TkqtBc" }
         })
       ).toEqual(true);
 

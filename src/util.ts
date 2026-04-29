@@ -100,3 +100,14 @@ export const isValidQueuesType = (v: string) => {
 export const isValidOfferSearchType = (v: number) => {
   return typeof v === 'number' && (v === OfferSearchType.Status || v === OfferSearchType.History || v === OfferSearchType.Both);
 };
+
+/**
+ * Validate a condition and throw a descriptive Error if it fails.
+ * Use this instead of Node's `assert` module for input validation so that
+ * errors are consistent Error instances with a clear message.
+ */
+export function assertValid(condition: boolean, message: string): asserts condition {
+  if (!condition) {
+    throw new Error(message);
+  }
+}

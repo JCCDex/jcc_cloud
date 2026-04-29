@@ -9,7 +9,8 @@ import {
   isValidQueryType,
   funcBytesToHex,
   isValidQueuesState,
-  isValidQueuesType
+  isValidQueuesType,
+  assertValid
 } from "./util";
 import {
   IAccount,
@@ -35,7 +36,6 @@ import {
   QueuesType
 } from "./txpoolTypes";
 import { AbstractKeyPair } from "./types";
-const assert = require("assert");
 
 export default class JCCDexTxPool {
   public fetch;
@@ -53,6 +53,7 @@ export default class JCCDexTxPool {
   private keypair;
 
   constructor(baseUrl: string, keypair: AbstractKeyPair, customFetch?: unknown) {
+    assertValid(isValidString(baseUrl), "baseUrl is invalid");
     this.baseUrl = baseUrl;
     this.fetch = customFetch || defaultFetch;
     this.keypair = keypair;
@@ -76,8 +77,8 @@ export default class JCCDexTxPool {
    * @returns {address signedAddress publicKey}
    */
   public getAddressPublicKey(secret: string): IAccount {
-    assert(isValidString(secret), "Secret is invalid");
-    assert(this.keypair.isValidSecret(secret), "Secret is invalid");
+    assertValid(isValidString(secret), "Secret is invalid");
+    assertValid(this.keypair.isValidSecret(secret), "Secret is invalid");
     const kp = this.keypair.deriveKeyPair(secret);
     const privateKey = kp.privateKey;
     const publicKey = kp.publicKey;
@@ -97,13 +98,13 @@ export default class JCCDexTxPool {
    * @returns {IFetchSeqsResponse}
    */
   public async getSeqsFromTxPool(options: IFetchSeqsOptions): Promise<IFetchSeqsResponse> {
-    assert(isValidString(options.publicKey), "PublicKey is invalid");
-    assert(isValidString(options.signedAddr), "SignedAddr is invalid");
-    assert(isValidFromChain(options.fromChain), "FromChain is invalid");
-    assert(isValidCount(options.count), "Count is invalid");
+    assertValid(isValidString(options.publicKey), "PublicKey is invalid");
+    assertValid(isValidString(options.signedAddr), "SignedAddr is invalid");
+    assertValid(isValidFromChain(options.fromChain), "FromChain is invalid");
+    assertValid(isValidCount(options.count), "Count is invalid");
     const res = await this.fetch({
       baseURL: this.baseUrl,
-      url: `/tran/api/sequences/${options.publicKey}`,
+      url: `/tran/api/sequences/${encodeURIComponent(options.publicKey)}`,
       method: "get",
       params: {
         signedAddr: options.signedAddr,
@@ -190,11 +191,11 @@ export default class JCCDexTxPool {
    */
   public async batchSignWithSeqs(options: IBatchSignData): Promise<ITxPoolData> {
     const { txList, seqs, secret } = options;
-    assert(this.isValidTxList(txList), "TxList is invalid");
-    assert(isValideSeqs(seqs), "Seqs list is invalid");
-    assert(seqs.length === txList.length, "Seqs quantity is not equal to tx quantity");
-    assert(isValidString(secret), "Secret is invalid");
-    assert(this.keypair.isValidSecret(secret), "Secret is invalid");
+    assertValid(this.isValidTxList(txList), "TxList is invalid");
+    assertValid(isValideSeqs(seqs), "Seqs list is invalid");
+    assertValid(seqs.length === txList.length, "Seqs quantity is not equal to tx quantity");
+    assertValid(isValidString(secret), "Secret is invalid");
+    assertValid(this.keypair.isValidSecret(secret), "Secret is invalid");
     delete options.secret;
 
     const account = this.getAddressPublicKey(secret);
@@ -230,12 +231,12 @@ export default class JCCDexTxPool {
    */
   public async submitToTxPool(options: ISubmitOptions): Promise<ISubmitResponse> {
     const { publicKey, submitPara } = options;
-    assert(isValidString(publicKey), "PublicKey is invalid");
-    assert(isValidString(submitPara.dataHashSign), "DataHashSign is invalid");
-    assert(isValidString(submitPara.dataJsonStr), "DataJsonStr is invalid");
+    assertValid(isValidString(publicKey), "PublicKey is invalid");
+    assertValid(isValidString(submitPara.dataHashSign), "DataHashSign is invalid");
+    assertValid(isValidString(submitPara.dataJsonStr), "DataJsonStr is invalid");
     const res = await this.fetch({
       baseURL: this.baseUrl,
-      url: `/tran/api/submit/${publicKey}`,
+      url: `/tran/api/submit/${encodeURIComponent(publicKey)}`,
       method: "post",
       data: submitPara
     });
@@ -261,12 +262,12 @@ export default class JCCDexTxPool {
   // * ===若短时间内上传了多个钱包地址的大量交易数据，此时需要慎重，因为30秒内可能有地址还未轮训到或者有交易还未提交上链；
   public async fetchSubmittedData(options: IFetchSubmittedOptions): Promise<IFetchSubmittedResponse> {
     const { publicKey, state, count } = options;
-    assert(isValidString(publicKey), "PublicKey is invalid");
-    assert(isValidQueryState(state), "State is invalid");
-    assert(isValidQueryType(count), "Count is invalid");
+    assertValid(isValidString(publicKey), "PublicKey is invalid");
+    assertValid(isValidQueryState(state), "State is invalid");
+    assertValid(isValidQueryType(count), "Count is invalid");
     const res = await this.fetch({
       baseURL: this.baseUrl,
-      url: `/tran/api/submitted/${publicKey}`,
+      url: `/tran/api/submitted/${encodeURIComponent(publicKey)}`,
       method: "get",
       params: {
         state: state,
@@ -291,11 +292,11 @@ export default class JCCDexTxPool {
    */
   public async cancelSubmitChain(options: ICancelSubmitOptions): Promise<ICancelSubmitResponse> {
     const { publicKey, signedAddr } = options;
-    assert(isValidString(publicKey), "PublicKey is invalid");
-    assert(isValidString(signedAddr), "SignedAddr is invalid");
+    assertValid(isValidString(publicKey), "PublicKey is invalid");
+    assertValid(isValidString(signedAddr), "SignedAddr is invalid");
     const res = await this.fetch({
       baseURL: this.baseUrl,
-      url: `/tran/api/cancel/${publicKey}`,
+      url: `/tran/api/cancel/${encodeURIComponent(publicKey)}`,
       method: "post",
       params: {
         signedAddr
@@ -320,12 +321,12 @@ export default class JCCDexTxPool {
    */
   public async fetchTxPoolQueues(options: IFetchTxPoolQueuesOptions): Promise<IFetchTxPoolQueuesResponse> {
     const { publicKey, state, type } = options;
-    assert(isValidString(publicKey), "PublicKey is invalid");
-    assert(isValidQueuesState(state), "State is invalid");
-    assert(isValidQueuesType(type), "Type is invalid");
+    assertValid(isValidString(publicKey), "PublicKey is invalid");
+    assertValid(isValidQueuesState(state), "State is invalid");
+    assertValid(isValidQueuesType(type), "Type is invalid");
     const res = await this.fetch({
       baseURL: this.baseUrl,
-      url: `/tran/api/pool-data/current-count/${publicKey}`,
+      url: `/tran/api/pool-data/current-count/${encodeURIComponent(publicKey)}`,
       method: "get",
       params: {
         state,
